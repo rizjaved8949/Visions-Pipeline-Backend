@@ -1,0 +1,12 @@
+opencv-python
+numpy
+insightface
+onnxruntime
+pandas
+keyboard
+fastapi
+uvicorn
+python-multipart
+openpyxl
+python-dotenv
+reportlab
