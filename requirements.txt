@@ -10,3 +10,8 @@ python-multipart
 openpyxl
 python-dotenv
 reportlab
+rfdetr
+supervision
+trackers
+ultralytics
+mediapipe

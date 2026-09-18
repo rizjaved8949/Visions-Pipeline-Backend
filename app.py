@@ -16,50 +16,80 @@ def ensure_python_deps():
         os.path.exists(DEPS_MARKER)
         and os.path.getmtime(DEPS_MARKER) >= os.path.getmtime(REQUIREMENTS_FILE)
     )
+
     if up_to_date:
         print("[INFO] Python dependencies already installed.")
         return
 
     print("[INFO] Installing Python dependencies from requirements.txt...")
+
     subprocess.run(
-        [sys.executable, "-m", "pip", "install", "-r", REQUIREMENTS_FILE],
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "-r",
+            REQUIREMENTS_FILE,
+        ],
         check=True,
     )
+
     with open(DEPS_MARKER, "w") as f:
         f.write("installed")
 
 
 def ensure_frontend_deps(frontend_dir):
     node_modules = os.path.join(frontend_dir, "node_modules")
+
     if not os.path.isdir(node_modules):
         print("[INFO] node_modules not found, running 'npm install'...")
-        subprocess.run(["npm", "install"], cwd=frontend_dir, shell=True, check=True)
+
+        subprocess.run(
+            ["npm", "install"],
+            cwd=frontend_dir,
+            shell=True,
+            check=True,
+        )
     else:
         print("[INFO] Frontend dependencies already installed.")
 
 
 def main():
-    # Must happen before anything below, since dotenv/fastapi/etc. may not
-    # exist on disk at all until this has run.
+    # Must happen before importing dotenv/FastAPI/guard packages because
+    # dependencies may not yet be installed on a fresh machine.
     ensure_python_deps()
 
     from dotenv import load_dotenv
 
     load_dotenv()
+
     frontend_dir = os.environ["FRONTEND_DIR"]
 
+    # This imports and starts the existing backend.
+    # Guard routes should be registered inside Attendance/server.py,
+    # where the actual FastAPI app exists.
     from Attendance import server
 
     ensure_frontend_deps(frontend_dir)
 
-    backend_thread = threading.Thread(target=server.run, daemon=True)
+    backend_thread = threading.Thread(
+        target=server.run,
+        daemon=True,
+    )
     backend_thread.start()
 
     print("[INFO] Starting frontend ('npm run dev')...")
-    frontend_process = subprocess.Popen(["npm", "run", "dev"], cwd=frontend_dir, shell=True)
+
+    frontend_process = subprocess.Popen(
+        ["npm", "run", "dev"],
+        cwd=frontend_dir,
+        shell=True,
+    )
 
     try:
         frontend_process.wait()
+
     except KeyboardInterrupt:
         print("\n[INFO] Shutting down frontend...")
         frontend_process.terminate()

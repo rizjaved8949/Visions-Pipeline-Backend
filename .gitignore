@@ -21,3 +21,15 @@ attendance_sessions.csv
 # OS
 .DS_Store
 Thumbs.db
+
+# Guard monitoring runtime data
+Guard_monotoring/local_data/guard/uploads/*
+!Guard_monotoring/local_data/guard/uploads/.gitkeep
+Guard_monotoring/local_data/guard/outputs/*
+!Guard_monotoring/local_data/guard/outputs/.gitkeep
+Guard_monotoring/local_data/guard/*.sqlite3
+Guard_monotoring/local_data/guard/*.sqlite3-*
+
+# Guard model weights
+Guard_monotoring/weights/guard/*
+!Guard_monotoring/weights/guard/.gitkeep
