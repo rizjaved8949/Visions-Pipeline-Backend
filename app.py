@@ -3,6 +3,7 @@ import subprocess
 import sys
 import threading
 
+
 MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 REQUIREMENTS_FILE = os.path.join(MODULE_DIR, "requirements.txt")
 DEPS_MARKER = os.path.join(MODULE_DIR, ".deps_installed")
@@ -12,6 +13,7 @@ def ensure_python_deps():
     """Install everything in requirements.txt if it hasn't been installed yet
     (or requirements.txt changed since the last install), so a plain
     `python app.py` works on a fresh machine with nothing pre-installed."""
+
     up_to_date = (
         os.path.exists(DEPS_MARKER)
         and os.path.getmtime(DEPS_MARKER) >= os.path.getmtime(REQUIREMENTS_FILE)
@@ -56,8 +58,8 @@ def ensure_frontend_deps(frontend_dir):
 
 
 def main():
-    # Must happen before importing dotenv/FastAPI/guard packages because
-    # dependencies may not yet be installed on a fresh machine.
+
+    # Existing dependency setup
     ensure_python_deps()
 
     from dotenv import load_dotenv
@@ -66,10 +68,32 @@ def main():
 
     frontend_dir = os.environ["FRONTEND_DIR"]
 
-    # This imports and starts the existing backend.
-    # Guard routes should be registered inside Attendance/server.py,
-    # where the actual FastAPI app exists.
+    # Existing backend
     from Attendance import server
+
+
+    # ========================================================
+    # NEW - KITCHEN HYGIENE ROUTER
+    # ========================================================
+
+    from kitchen_monitoring.api import (
+        router as kitchen_router,
+    )
+
+    server.app.include_router(
+        kitchen_router,
+        prefix="/api/kitchen",
+        tags=["Kitchen Hygiene"],
+    )
+
+    print(
+        "[INFO] Kitchen Hygiene API added at /api/kitchen"
+    )
+
+
+    # ========================================================
+    # EXISTING CODE - UNCHANGED
+    # ========================================================
 
     ensure_frontend_deps(frontend_dir)
 
@@ -77,6 +101,7 @@ def main():
         target=server.run,
         daemon=True,
     )
+
     backend_thread.start()
 
     print("[INFO] Starting frontend ('npm run dev')...")
