@@ -9,7 +9,6 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from . import attendance
-from Guard_monotoring.guard_monitoring.api import router as guard_monitoring_router
 
 REPORT_MEDIA_TYPES = {
     "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -17,12 +16,6 @@ REPORT_MEDIA_TYPES = {
 }
 
 app = FastAPI()
-
-app.include_router(
-    guard_monitoring_router,
-    prefix="/api/guard",
-    tags=["Guard Monitoring"],
-)
 
 app.add_middleware(
     CORSMiddleware,

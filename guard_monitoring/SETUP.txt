@@ -1,0 +1,30 @@
+GUARD MONITORING - EXACT LOCAL SETUP
+
+1) Keep this folder structure as-is: guard_monitoring/ at the repo root, containing
+   the package code, scripts/, tests/, and weights/. Runtime data lives outside it,
+   under local_data/guard/ at the repo root.
+
+2) The fine-tuned RF-DETR checkpoint (and the other model weights) are committed to
+   the repo via Git LFS, at:
+   guard_monitoring/weights/
+
+   If you need to replace a checkpoint, copy the new file into that folder.
+
+3) In the ONE root .env file set the exact filename, for example:
+   GUARD_RFDETR_WEIGHTS=guard_monitoring/weights/<ACTUAL_FILENAME>
+
+   Do not guess GUARD_RFDETR_TARGET_LABEL. Leave it blank for a single-class
+   guard checkpoint. Set it only if the checkpoint has multiple classes and you
+   know the exact trained guard class name.
+
+4) Install from the ONE root requirements file:
+   pip install -r requirements.txt
+
+5) Test from the repository root (Windows CMD / VS Code CMD terminal):
+   python guard_monitoring\scripts\run_guard_video.py --source "D:\Videos\guard_test.mp4" --output "local_data\guard\outputs\test01" --test-mode
+
+6) Start the existing application normally:
+   python app.py
+
+The guard API is registered inside app.py at /api/guard/*.
+The existing launcher app.py is not turned into a second FastAPI application.

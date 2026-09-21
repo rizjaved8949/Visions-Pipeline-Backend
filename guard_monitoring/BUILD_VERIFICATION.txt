@@ -1,0 +1,23 @@
+Guard monitoring integration verification
+
+Verified after integrating into the uploaded Visions-Pipeline-Backend structure:
+- Guard_monotoring wrapper structure flattened to a single guard_monitoring/ package
+  at the repo root (matching the other pipeline modules) as part of a later reorg.
+- Existing launcher app.py retained; no second FastAPI app created.
+- Guard APIRouter registered in app.py, alongside the other pipeline modules.
+- One root .env retained and guard runtime-data paths point at local_data/guard.
+- One root requirements.txt retained, de-duplicated, with unpinned package names.
+- Fine-tuned RF-DETR checkpoint loading wired through RFDETR.from_checkpoint().
+- Checkpoint filename and trained class label are intentionally not guessed.
+- Python compileall passed.
+- Guard unit/failure-isolation tests passed: 8 passed.
+- Nested CLI --help passed from repository root.
+- Guard API import remained lazy: heavy CV model packages are not loaded by importing the router.
+
+Not verified because the required artifact was not uploaded:
+- Accuracy/inference of the user's actual fine-tuned RF-DETR checkpoint.
+- Exact trained class label inside that checkpoint.
+- Real CCTV accuracy on the user's local videos.
+
+Those require copying the user's downloaded checkpoint into guard_monitoring/weights/
+and setting GUARD_RFDETR_WEIGHTS in the root .env.

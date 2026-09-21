@@ -73,6 +73,25 @@ def main():
 
 
     # ========================================================
+    # GUARD MONITORING ROUTER
+    # ========================================================
+
+    from guard_monitoring.api import (
+        router as guard_monitoring_router,
+    )
+
+    server.app.include_router(
+        guard_monitoring_router,
+        prefix="/api/guard",
+        tags=["Guard Monitoring"],
+    )
+
+    print(
+        "[INFO] Guard Monitoring API added at /api/guard"
+    )
+
+
+    # ========================================================
     # NEW - KITCHEN HYGIENE ROUTER
     # ========================================================
 

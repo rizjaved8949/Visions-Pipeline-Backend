@@ -23,13 +23,21 @@ attendance_sessions.csv
 Thumbs.db
 
 # Guard monitoring runtime data
-Guard_monotoring/local_data/guard/uploads/*
-!Guard_monotoring/local_data/guard/uploads/.gitkeep
-Guard_monotoring/local_data/guard/outputs/*
-!Guard_monotoring/local_data/guard/outputs/.gitkeep
-Guard_monotoring/local_data/guard/*.sqlite3
-Guard_monotoring/local_data/guard/*.sqlite3-*
+local_data/guard/uploads/*
+!local_data/guard/uploads/.gitkeep
+local_data/guard/outputs/*
+!local_data/guard/outputs/.gitkeep
+local_data/guard/*.sqlite3
+local_data/guard/*.sqlite3-*
 
-# Guard model weights
-Guard_monotoring/weights/guard/*
-!Guard_monotoring/weights/guard/.gitkeep
+# Downloaded at runtime by guard_monitoring/io.py to enable browser-playable H.264 output
+local_data/guard/codecs/
+
+# Kitchen monitoring runtime data
+local_data/kitchen/uploads/*
+local_data/kitchen/sessions/*
+local_data/kitchen/reports/*
+local_data/kitchen/*.db
+
+# Model weights are intentionally tracked (via Git LFS, see .gitattributes) so a
+# fresh clone + `python app.py` works with no manual file copying.
