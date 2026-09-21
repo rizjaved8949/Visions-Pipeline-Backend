@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import os
 import uuid
 from pathlib import Path
@@ -8,6 +9,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
+from . import report
 from .config import guard_enabled
 from .service import GuardQueueFullError, get_service
 from .live_service import get_live_service
@@ -211,6 +213,74 @@ def get_annotated_video(job_id: str):
     return FileResponse(path, media_type="video/mp4", filename=f"{job_id}-annotated.mp4")
 
 
+def _build_report_response(
+    report_id: str,
+    *,
+    title: str,
+    camera_id: str,
+    source: str,
+    fps: float,
+    duty_seconds: float,
+    stats: dict,
+    events: list[dict],
+    fmt: str,
+):
+    summary_rows, event_rows = report.build_report_rows(
+        camera_id=camera_id,
+        source=source,
+        fps=fps,
+        duty_seconds=duty_seconds,
+        stats=stats,
+        events=events,
+    )
+    fmt = (fmt or "pdf").lower()
+    if fmt == "xlsx":
+        data = report.build_xlsx(summary_rows, event_rows)
+        media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        filename = f"{report_id}-report.xlsx"
+    elif fmt == "pdf":
+        data = report.build_pdf(title, summary_rows, event_rows)
+        media_type = "application/pdf"
+        filename = f"{report_id}-report.pdf"
+    else:
+        raise HTTPException(status_code=400, detail="format must be 'pdf' or 'xlsx'")
+    return {
+        "media_type": media_type,
+        "report_base64": base64.b64encode(data).decode("ascii"),
+        "report_filename": filename,
+    }
+
+
+@router.get("/jobs/{job_id}/report")
+def get_job_report(job_id: str, format: str = "pdf"):
+    _require_enabled()
+    job = _job_or_404(job_id)
+    summary = job.summary or get_service().read_json_output(job_id, "summary.json")
+    if summary is None:
+        raise HTTPException(status_code=409, detail=f"Summary not ready; status={job.status}")
+    events = get_service().read_events(job_id) or []
+    stats = {
+        "visible_frames": summary.get("guard_visible_frames", 0),
+        "stationary_frames": summary.get("stationary_frames", 0),
+        "sleep_candidate_frames": summary.get("sleep_candidate_frames", 0),
+        "phone_use_frames": summary.get("phone_use_frames", 0),
+        "absence_frames": summary.get("absence_frames", 0),
+    }
+    fps = float(summary.get("fps") or 25.0)
+    duty_seconds = float(summary.get("frames_processed", 0)) / fps if fps else 0.0
+    return _build_report_response(
+        job_id,
+        title="Guard Monitoring Job Report",
+        camera_id=str(summary.get("camera_id", "camera-01")),
+        source=str(summary.get("source", job.source_path)),
+        fps=fps,
+        duty_seconds=duty_seconds,
+        stats=stats,
+        events=events,
+        fmt=format,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Real-time CCTV monitoring endpoints. These are additive and do not replace
 # the existing uploaded-video /jobs API above.
@@ -228,6 +298,25 @@ def _live_or_404(session_id: str):
 def list_live_sessions():
     _require_enabled()
     return {"sessions": get_live_service().list()}
+
+
+@router.get("/live/current/stream")
+def get_current_live_stream():
+    """Stable URL for whichever live session is currently active - mirrors the
+    Attendance module's single fixed /api/video_feed endpoint, so the frontend
+    doesn't need a session_id in hand before it can start streaming."""
+    _require_enabled()
+    session_id = get_live_service().current_session_id()
+    if session_id is None:
+        raise HTTPException(status_code=404, detail="No guard live session has been started yet")
+    return StreamingResponse(
+        get_live_service().mjpeg(session_id),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+        },
+    )
 
 
 @router.post("/live/start", response_model=LiveSessionCreated, status_code=202)
@@ -264,6 +353,25 @@ def get_live_events(session_id: str):
     _live_or_404(session_id)
     events = get_live_service().events(session_id)
     return {"session_id": session_id, "events": events or []}
+
+
+@router.get("/live/{session_id}/report")
+def get_live_report(session_id: str, format: str = "pdf"):
+    _require_enabled()
+    session = _live_or_404(session_id)
+    public = session.public()
+    events = get_live_service().events(session_id) or []
+    return _build_report_response(
+        session_id,
+        title="Guard Live Monitoring Report",
+        camera_id=public["camera_id"],
+        source=public["source"],
+        fps=float(public["analysis_fps"] or 3.0),
+        duty_seconds=float(public["uptime_seconds"]),
+        stats=public["stats"],
+        events=events,
+        fmt=format,
+    )
 
 
 @router.get("/live/{session_id}/module-health")
