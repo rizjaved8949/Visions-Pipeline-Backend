@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from dataclasses import asdict
 from pathlib import Path
@@ -100,6 +101,7 @@ class GuardMonitoringPipeline:
             total_frames = min(raw_total, int(max_frames)) if raw_total > 0 else int(max_frames)
 
         writer = make_writer(video_path, width, height, fps)
+        self.latest_frame = out_dir / "latest.jpg"
 
         duty_zone = normalized_polygon_to_pixels(self.cfg["guard_selection"]["duty_zone"], width, height)
         patrol_zones = [
@@ -169,6 +171,7 @@ class GuardMonitoringPipeline:
                         if not continue_on_frame_error:
                             raise
                         writer.write(frame)
+                        self._write_latest_frame(frame)
                         frame_log.write(
                             {
                                 "frame": frame_count,
@@ -195,6 +198,7 @@ class GuardMonitoringPipeline:
                         event_log.write(event)
 
                     writer.write(result["annotated"])
+                    self._write_latest_frame(result["annotated"])
                     frame_log.write(result["frame_log"])
 
                     if display:
@@ -208,6 +212,7 @@ class GuardMonitoringPipeline:
             finally:
                 cap.release()
                 writer.release()
+                self.latest_frame.unlink(missing_ok=True)
                 if display:
                     cv2.destroyAllWindows()
 
@@ -237,6 +242,23 @@ class GuardMonitoringPipeline:
         summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
         self._progress("completed", frame_count, total_frames, summary=summary)
         return summary
+
+    def _write_latest_frame(self, frame) -> None:
+        """Write-then-rename so a concurrent MJPEG reader (see
+        /jobs/{job_id}/stream) never opens a half-written JPEG - the same
+        race fixed for Kitchen's live preview. Must still end in .jpg since
+        cv2.imwrite picks its encoder from the file extension."""
+        tmp_path = str(self.latest_frame.with_name(self.latest_frame.stem + ".tmp" + self.latest_frame.suffix))
+        if not cv2.imwrite(tmp_path, frame):
+            return
+        for attempt in range(5):
+            try:
+                os.replace(tmp_path, str(self.latest_frame))
+                break
+            except PermissionError:
+                if attempt == 4:
+                    return
+                time.sleep(0.01)
 
     def _process_frame(
         self,

@@ -11,6 +11,8 @@ from pathlib import Path
 
 import cv2
 
+from guard_monitoring.io import make_writer
+
 from .config import (
     DEVICE,
     PERSON_IMAGE_SIZE,
@@ -1558,18 +1560,16 @@ class KitchenPipeline:
         )
 
 
-        writer = cv2.VideoWriter(
-            str(
-                self.output_video
-            ),
-            cv2.VideoWriter_fourcc(
-                *"mp4v"
-            ),
+        # mp4v (MPEG-4 Part 2) is not decodable by Chrome, Edge or Firefox -
+        # the browser <video> element shows a black frame with 0:00 duration
+        # even though the file itself is valid. make_writer() tries real
+        # H.264 first (falling back to mp4v only if that's unavailable),
+        # same fix already applied for Guard's job output.
+        writer = make_writer(
+            self.output_video,
+            width,
+            height,
             fps,
-            (
-                width,
-                height,
-            ),
         )
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import os
+import time
 import uuid
 from pathlib import Path
 
@@ -211,6 +212,47 @@ def get_annotated_video(job_id: str):
     if not path.exists():
         raise HTTPException(status_code=409, detail=f"Annotated video not ready; status={job.status}")
     return FileResponse(path, media_type="video/mp4", filename=f"{job_id}-annotated.mp4")
+
+
+def _job_stream_generator(job_id: str):
+    """Live preview of a job's annotated frames while it's still processing -
+    mirrors Kitchen's /sessions/{id}/stream, reading the same write-then-
+    rename latest.jpg a running job keeps updating (see pipeline.py's
+    _write_latest_frame). Ends once the job leaves "processing"."""
+    while True:
+        job = get_service().store.get(job_id)
+        if job is None:
+            break
+
+        frame_path = Path(job.output_dir) / "latest.jpg"
+        if frame_path.exists():
+            data = None
+            for attempt in range(5):
+                try:
+                    with open(frame_path, "rb") as f:
+                        data = f.read()
+                    break
+                except (PermissionError, FileNotFoundError):
+                    if attempt == 4:
+                        data = None
+                        break
+                    time.sleep(0.01)
+            if data:
+                yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + data + b"\r\n")
+
+        if job.status in {"completed", "failed"}:
+            break
+        time.sleep(0.1)
+
+
+@router.get("/jobs/{job_id}/stream")
+def get_job_stream(job_id: str):
+    _require_enabled()
+    _job_or_404(job_id)
+    return StreamingResponse(
+        _job_stream_generator(job_id),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )
 
 
 def _build_report_response(

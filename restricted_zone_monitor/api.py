@@ -3,7 +3,7 @@ import base64
 from typing import List, Optional
 
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
 from . import monitor, reporting
@@ -147,6 +147,17 @@ def wipe_data():
 @router.get("/status")
 def status():
     return monitor.get_status()
+
+
+@router.get("/session/video")
+def session_video():
+    """The just-finished session's annotated video - stays available for
+    replay until /session/report or /wipe_data clears it, same lifetime as
+    the report."""
+    path = monitor.get_session_video_path()
+    if path is None:
+        raise HTTPException(404, "No processed video available for this session.")
+    return FileResponse(path, media_type="video/mp4", filename="restricted_zone_recording.mp4")
 
 
 @router.get("/video_feed")

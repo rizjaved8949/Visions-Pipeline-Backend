@@ -45,6 +45,8 @@ local_data/restricted_zone/uploads/*
 !local_data/restricted_zone/uploads/.gitkeep
 local_data/restricted_zone/snapshots/*
 !local_data/restricted_zone/snapshots/.gitkeep
+local_data/restricted_zone/outputs/*
+!local_data/restricted_zone/outputs/.gitkeep
 
 # Model weights are intentionally tracked (via Git LFS, see .gitattributes) so a
 # fresh clone + `python app.py` works with no manual file copying.

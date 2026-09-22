@@ -10,8 +10,9 @@ WEIGHTS_DIR = PACKAGE_DIR / "weights"
 DATA_DIR = PROJECT_ROOT / "local_data" / "restricted_zone"
 UPLOAD_DIR = DATA_DIR / "uploads"
 SNAPSHOT_DIR = DATA_DIR / "snapshots"
+OUTPUT_DIR = DATA_DIR / "outputs"
 
-for directory in (WEIGHTS_DIR, DATA_DIR, UPLOAD_DIR, SNAPSHOT_DIR):
+for directory in (WEIGHTS_DIR, DATA_DIR, UPLOAD_DIR, SNAPSHOT_DIR, OUTPUT_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 

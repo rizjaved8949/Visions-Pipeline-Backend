@@ -141,6 +141,32 @@ def main():
 
 
     # ========================================================
+    # NEW - SAMPLE VIDEOS (shared across every pipeline's frontend)
+    # ========================================================
+
+    from fastapi.staticfiles import StaticFiles
+
+    from sample_videos import router as sample_videos_router, SAMPLE_DIR
+
+    server.app.include_router(
+        sample_videos_router,
+        prefix="/api/sample-videos",
+        tags=["Sample Videos"],
+    )
+
+    if os.path.isdir(SAMPLE_DIR):
+        server.app.mount(
+            "/sample-videos",
+            StaticFiles(directory=SAMPLE_DIR),
+            name="sample-videos-files",
+        )
+
+    print(
+        "[INFO] Sample Videos API added at /api/sample-videos"
+    )
+
+
+    # ========================================================
     # EXISTING CODE - UNCHANGED
     # ========================================================
 

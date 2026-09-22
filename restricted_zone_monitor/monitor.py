@@ -25,6 +25,8 @@ from typing import List, Optional
 
 import cv2
 
+from guard_monitoring.io import make_writer
+
 from . import config
 from .breach import BreachManager
 from .detector import Detector
@@ -187,6 +189,7 @@ def start_session() -> dict:
             "events": [],
             "frame_count": 0,
             "total_breaches": 0,
+            "video_path": None,
         }
         is_capturing = True
 
@@ -256,6 +259,18 @@ def _capture_loop() -> None:
     snap_dir = os.path.join(str(config.SNAPSHOT_DIR), str(session_id))
     os.makedirs(snap_dir, exist_ok=True)
 
+    video_path = os.path.join(str(config.OUTPUT_DIR), f"{session_id}.mp4")
+    writer = None
+    try:
+        writer = make_writer(video_path, video.width, video.height, video.fps)
+        with session_lock:
+            session["video_path"] = video_path
+    except Exception as e:  # noqa: BLE001
+        # A replayable video is a nice-to-have, not essential - the live
+        # stream, breach log and report still work without it.
+        print(f"[restricted_zone_monitor] Could not open output video writer: {e}")
+        writer = None
+
     try:
         while capture_thread_running:
             ok, frame = video.read()
@@ -293,6 +308,9 @@ def _capture_loop() -> None:
             banner.draw(frame)
             draw_hud(frame, 0.0, len(dets), len(inside_map), breach_mgr.total_breaches)
 
+            if writer is not None:
+                writer.write(frame)
+
             with session_lock:
                 session["frame_count"] = frame_idx
 
@@ -303,6 +321,8 @@ def _capture_loop() -> None:
                 time.sleep(0.01)
     finally:
         video.release()
+        if writer is not None:
+            writer.release()
         with frame_lock:
             latest_frame = None
         latest_person_count = 0
@@ -322,7 +342,7 @@ def _capture_loop() -> None:
 def get_status() -> dict:
     with session_lock:
         if current_session is None:
-            return {"is_capturing": False, "has_report": False}
+            return {"is_capturing": False, "has_report": False, "has_video": False}
         s = current_session
         return {
             "is_capturing": is_capturing,
@@ -339,7 +359,19 @@ def get_status() -> dict:
                 for e in list(reversed(s["events"]))[:20]
             ],
             "has_report": not is_capturing,
+            "has_video": not is_capturing and bool(s["video_path"]) and os.path.exists(s["video_path"]),
         }
+
+
+def get_session_video_path() -> Optional[str]:
+    """The just-finished session's annotated video, kept around after stop
+    for replay - same lifetime as the report (see wipe_all_data). None while
+    a session is still running or if no session has been recorded yet."""
+    with session_lock:
+        if current_session is None or is_capturing:
+            return None
+        path = current_session["video_path"]
+        return path if path and os.path.exists(path) else None
 
 
 def get_latest_jpeg():
@@ -365,6 +397,12 @@ def wipe_all_data() -> None:
         if current_session is not None:
             snap_dir = os.path.join(str(config.SNAPSHOT_DIR), str(current_session["session_id"]))
             shutil.rmtree(snap_dir, ignore_errors=True)
+            video_path = current_session["video_path"]
+            if video_path:
+                try:
+                    os.remove(video_path)
+                except OSError:
+                    pass
         current_session = None
         is_capturing = False
 
