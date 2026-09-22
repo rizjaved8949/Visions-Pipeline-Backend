@@ -1,3 +1,4 @@
+import os
 import time
 
 from collections import (
@@ -404,6 +405,7 @@ class KitchenPipeline:
         self,
         session_id,
         stop_event,
+        source_type="upload",
     ):
 
         self.session_id = (
@@ -412,6 +414,10 @@ class KitchenPipeline:
 
         self.stop_event = (
             stop_event
+        )
+
+        self.source_type = (
+            source_type
         )
 
         self.person_model = (
@@ -430,6 +436,22 @@ class KitchenPipeline:
 
 
         self.track_last_seen = {}
+
+        # Cumulative, session-wide per-requirement frame tallies. _summary()
+        # used to compute the "compliance by requirement" breakdown purely
+        # from the *current* frame's tracked persons, which meant it briefly
+        # reverted to "no data" every time temporal smoothing re-evaluated a
+        # track (or a track was lost/reacquired) even though real violations
+        # had already been confirmed and logged. Tallying every frame here
+        # instead gives a stable, session-long view.
+        self.requirement_frame_counts = {
+            requirement: {
+                "compliant": 0,
+                "violation": 0,
+                "unknown": 0,
+            }
+            for requirement in REQUIREMENTS
+        }
 
 
         self.output_dir = (
@@ -1007,65 +1029,41 @@ class KitchenPipeline:
         )
 
 
-        open_violations = 0
+        # "Open violations" is deliberately about right now, from the
+        # current persons snapshot (matches its "needs supervisor" framing).
+        open_violations = sum(
+            1
+            for person in persons
+            for requirement in REQUIREMENTS
+            if person[requirement]["state"] == "violation"
+        )
+
+
+        # "Compliance by requirement" and the overall score, on the other
+        # hand, use the session-wide cumulative tallies (self.requirement_
+        # frame_counts, updated every frame in process_frame) rather than
+        # just this instant's persons - otherwise a track reset or a brief
+        # temporal-smoothing gap makes an already-confirmed violation revert
+        # to "no data yet" even though it's still sitting in the violations
+        # log.
+        requirements = {}
 
         known = 0
 
         compliant = 0
 
 
-        requirements = {}
-
-
         for requirement in REQUIREMENTS:
 
-            compliant_count = 0
+            counts = self.requirement_frame_counts[
+                requirement
+            ]
 
-            violation_count = 0
+            compliant_count = counts["compliant"]
 
-            unknown_count = 0
+            violation_count = counts["violation"]
 
-
-            for person in persons:
-
-                state = (
-                    person[
-                        requirement
-                    ][
-                        "state"
-                    ]
-                )
-
-
-                if (
-                    state
-                    ==
-                    "compliant"
-                ):
-
-                    compliant_count += 1
-
-                    compliant += 1
-
-                    known += 1
-
-
-                elif (
-                    state
-                    ==
-                    "violation"
-                ):
-
-                    violation_count += 1
-
-                    open_violations += 1
-
-                    known += 1
-
-
-                else:
-
-                    unknown_count += 1
+            unknown_count = counts["unknown"]
 
 
             requirement_known = (
@@ -1073,6 +1071,10 @@ class KitchenPipeline:
                 +
                 violation_count
             )
+
+            known += requirement_known
+
+            compliant += compliant_count
 
 
             percentage = (
@@ -1423,6 +1425,20 @@ class KitchenPipeline:
                 state
             )
 
+            for requirement in REQUIREMENTS:
+
+                req_state = state[
+                    requirement
+                ][
+                    "state"
+                ]
+
+                self.requirement_frame_counts[
+                    requirement
+                ][
+                    req_state
+                ] += 1
+
 
         # Clean stale tracks
         for track_id in list(
@@ -1576,6 +1592,12 @@ class KitchenPipeline:
 
         last_summary = {}
 
+        reconnect_attempts = 0
+
+        MAX_RECONNECT_ATTEMPTS = 20
+
+        RECONNECT_DELAY_SECONDS = 1.0
+
 
         try:
 
@@ -1588,8 +1610,38 @@ class KitchenPipeline:
 
                 if not ok:
 
-                    break
+                    if self.source_type == "upload":
+                        # End of file - the correct, expected way an
+                        # uploaded video finishes.
+                        break
 
+                    # Live camera/RTSP: a single failed read is usually
+                    # transient (USB hiccup, exposure change, brief signal
+                    # drop) - reconnect instead of ending the whole session
+                    # on the first glitch.
+                    reconnect_attempts += 1
+
+                    if (
+                        reconnect_attempts
+                        > MAX_RECONNECT_ATTEMPTS
+                    ):
+                        break
+
+                    cap.release()
+
+                    if self.stop_event.wait(
+                        RECONNECT_DELAY_SECONDS
+                    ):
+                        break
+
+                    cap = cv2.VideoCapture(
+                        source
+                    )
+
+                    continue
+
+
+                reconnect_attempts = 0
 
                 frame_number += 1
 
@@ -1611,12 +1663,57 @@ class KitchenPipeline:
                 )
 
 
-                cv2.imwrite(
-                    str(
-                        self.latest_frame
-                    ),
-                    annotated,
+                # Write-then-rename so the stream endpoint (reading this same
+                # path from a different thread, on a timer) never opens a
+                # half-written file. cv2.imwrite() writing the real path
+                # directly let the reader occasionally catch a truncated
+                # JPEG mid-write, which fails to decode in the browser and
+                # kills the whole <img> stream even though this loop and the
+                # backend session keep running fine underneath.
+                # Must still end in .jpg - cv2.imwrite picks its encoder from
+                # the file extension, so a plain "+.tmp" suffix (ending in
+                # ".tmp", not ".jpg") makes it silently fail to write.
+                tmp_frame_path = str(
+                    self.latest_frame.with_name(
+                        self.latest_frame.stem
+                        + ".tmp"
+                        + self.latest_frame.suffix
+                    )
                 )
+
+                if not cv2.imwrite(
+                    tmp_frame_path,
+                    annotated,
+                ):
+                    raise RuntimeError(
+                        f"Failed to write frame preview: {tmp_frame_path}"
+                    )
+
+                # On Windows, os.replace() can transiently fail with
+                # PermissionError if the stream endpoint's reader has the
+                # destination file open at that exact instant (its read is a
+                # brief open+read+close, not a long-held lock). Retry a few
+                # times rather than letting one unlucky collision fail the
+                # whole session.
+                for attempt in range(5):
+
+                    try:
+
+                        os.replace(
+                            tmp_frame_path,
+                            str(
+                                self.latest_frame
+                            ),
+                        )
+
+                        break
+
+                    except PermissionError:
+
+                        if attempt == 4:
+                            raise
+
+                        time.sleep(0.01)
 
 
                 now = time.monotonic()

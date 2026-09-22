@@ -35,6 +35,18 @@ class KitchenService:
             threading.Lock()
         )
 
+        self._latest_session_id = None
+
+
+    def current_session_id(self):
+        """The most recently started session, regardless of whether it has
+        finished - lets a caller reach "whatever is live right now" through a
+        stable URL instead of needing the session_id up front."""
+
+        with self.lock:
+
+            return self._latest_session_id
+
 
     def _new_session_id(self):
 
@@ -85,12 +97,17 @@ class KitchenService:
                 session_id
             ] = stop_event
 
+            self._latest_session_id = (
+                session_id
+            )
+
 
         self.executor.submit(
             self._run,
             session_id,
             source,
             stop_event,
+            source_type,
         )
 
 
@@ -104,6 +121,7 @@ class KitchenService:
         session_id,
         source,
         stop_event,
+        source_type,
     ):
 
         try:
@@ -111,6 +129,7 @@ class KitchenService:
             pipeline = KitchenPipeline(
                 session_id,
                 stop_event,
+                source_type=source_type,
             )
 
 

@@ -635,6 +635,129 @@ def latest_frame(
 # MJPEG STREAM
 # ============================================================
 
+def _mjpeg_generator(session_id):
+
+    while True:
+
+        session = (
+            STORE.get_session(
+                session_id
+            )
+        )
+
+
+        if session is None:
+
+            break
+
+
+        frame_path = (
+            session.get(
+                "latest_frame"
+            )
+        )
+
+
+        if (
+            frame_path
+            and
+            Path(
+                frame_path
+            ).exists()
+        ):
+
+            # The pipeline thread writes this same file via a write-then-
+            # atomic-rename (see pipeline.py) so a reader never sees a
+            # half-written frame - but the rename itself can transiently
+            # deny access to a concurrent reader on Windows. That used to
+            # be an uncaught PermissionError here, which crashed this whole
+            # streaming response (visible as the video dying mid-stream).
+            # Skip this one polling tick and pick up the next frame instead.
+            data = None
+
+            for attempt in range(5):
+
+                try:
+
+                    with open(
+                        frame_path,
+                        "rb",
+                    ) as f:
+
+                        data = f.read()
+
+                    break
+
+                except (
+                    PermissionError,
+                    FileNotFoundError,
+                ):
+
+                    if attempt == 4:
+                        data = None
+                        break
+
+                    time.sleep(0.01)
+
+            if data:
+
+                yield (
+                    b"--frame\r\n"
+                    b"Content-Type: image/jpeg\r\n\r\n"
+                    +
+                    data
+                    +
+                    b"\r\n"
+                )
+
+
+        if (
+            session[
+                "status"
+            ]
+            in {
+                "completed",
+                "stopped",
+                "failed",
+            }
+        ):
+
+            break
+
+
+        time.sleep(
+            0.10
+        )
+
+
+@router.get(
+    "/sessions/current/stream"
+)
+def stream_current():
+    """Stable URL for whichever session is currently active - mirrors the
+    Guard module's /live/current/stream, so the frontend doesn't need a
+    session_id in hand before it can start streaming."""
+
+    session_id = (
+        SERVICE.current_session_id()
+    )
+
+    if session_id is None:
+
+        raise HTTPException(
+            404,
+            "No kitchen session has been started yet",
+        )
+
+    return StreamingResponse(
+        _mjpeg_generator(session_id),
+        media_type=(
+            "multipart/x-mixed-replace;"
+            " boundary=frame"
+        ),
+    )
+
+
 @router.get(
     "/sessions/{session_id}/stream"
 )
@@ -651,77 +774,8 @@ def stream(
             "Session not found",
         )
 
-
-    def generator():
-
-        while True:
-
-            session = (
-                STORE.get_session(
-                    session_id
-                )
-            )
-
-
-            if session is None:
-
-                break
-
-
-            frame_path = (
-                session.get(
-                    "latest_frame"
-                )
-            )
-
-
-            if (
-                frame_path
-                and
-                Path(
-                    frame_path
-                ).exists()
-            ):
-
-                with open(
-                    frame_path,
-                    "rb",
-                ) as f:
-
-                    data = f.read()
-
-
-                yield (
-                    b"--frame\r\n"
-                    b"Content-Type: image/jpeg\r\n\r\n"
-                    +
-                    data
-                    +
-                    b"\r\n"
-                )
-
-
-            if (
-                session[
-                    "status"
-                ]
-                in {
-                    "completed",
-                    "stopped",
-                    "failed",
-                }
-            ):
-
-                break
-
-
-            time.sleep(
-                0.10
-            )
-
-
     return StreamingResponse(
-        generator(),
+        _mjpeg_generator(session_id),
         media_type=(
             "multipart/x-mixed-replace;"
             " boundary=frame"

@@ -111,6 +111,36 @@ def main():
 
 
     # ========================================================
+    # NEW - RESTRICTED ZONE MONITOR ROUTER
+    # ========================================================
+
+    from restricted_zone_monitor.api import (
+        router as restricted_zone_router,
+    )
+    from restricted_zone_monitor import (
+        monitor as restricted_zone_monitor_state,
+    )
+
+    server.app.include_router(
+        restricted_zone_router,
+        prefix="/api/restricted-zone",
+        tags=["Restricted Zone Monitor"],
+    )
+
+    # Session + zone data is scoped to a single run (drawn fresh each time,
+    # discarded once the report is downloaded) - guarantee a clean slate no
+    # matter how the previous run ended, same as Attendance does.
+    # (Using the same on_event(...)(fn) form Attendance/server.py itself
+    # relies on - add_event_handler() was removed in newer FastAPI/Starlette.)
+    server.app.on_event("startup")(restricted_zone_monitor_state.wipe_all_data)
+    server.app.on_event("shutdown")(restricted_zone_monitor_state.wipe_all_data)
+
+    print(
+        "[INFO] Restricted Zone Monitor API added at /api/restricted-zone"
+    )
+
+
+    # ========================================================
     # EXISTING CODE - UNCHANGED
     # ========================================================
 
