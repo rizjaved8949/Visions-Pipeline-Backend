@@ -1,0 +1,8 @@
+Copy your fine-tuned RF-DETR guard checkpoint into this folder.
+
+Then set its exact repository-relative path in the single root .env file, for example:
+GUARD_RFDETR_WEIGHTS=Guard_monotoring/weights/guard/<YOUR_ACTUAL_CHECKPOINT_FILENAME>
+
+The project does not guess the checkpoint filename or the trained class label.
+If the checkpoint contains only one guard class, GUARD_RFDETR_TARGET_LABEL can remain blank.
+If it contains multiple classes, set GUARD_RFDETR_TARGET_LABEL to the exact trained guard class name.

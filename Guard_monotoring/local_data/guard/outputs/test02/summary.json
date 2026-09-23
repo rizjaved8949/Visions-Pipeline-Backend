@@ -1,0 +1,21 @@
+{
+  "camera_id": "camera-01",
+  "source": "D:\\Downloads\\WhatsApp Video 2026-09-17 at 6.14.43 PM.mp4",
+  "fps": 30.0,
+  "resolution": [
+    576,
+    1048
+  ],
+  "frames_processed": 349,
+  "frame_errors": 0,
+  "guard_visible_frames": 0,
+  "phone_detected_frames": 0,
+  "phone_use_frames": 0,
+  "sleep_candidate_frames": 0,
+  "events_triggered": 0,
+  "processing_wall_seconds": 54.892,
+  "output_video": "Guard_monotoring\\local_data\\guard\\outputs\\test02\\annotated.mp4",
+  "frame_log": "Guard_monotoring\\local_data\\guard\\outputs\\test02\\frames.jsonl",
+  "event_log": "Guard_monotoring\\local_data\\guard\\outputs\\test02\\events.jsonl",
+  "module_health": "Guard_monotoring\\local_data\\guard\\outputs\\test02\\module_health.json"
+}

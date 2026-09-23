@@ -1,0 +1,202 @@
+{
+  "eyes": {
+    "status": "unknown",
+    "calls": 349,
+    "successes": 0,
+    "errors": 187,
+    "unknowns": 162,
+    "disabled": 0,
+    "last_error": "RuntimeError",
+    "last_detail": "no_current_guard"
+  },
+  "eyes_load": {
+    "status": "error",
+    "calls": 187,
+    "successes": 0,
+    "errors": 187,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": "RuntimeError",
+    "last_detail": "cached_load_error: MediaPipe face landmarks are unavailable. Set GUARD_FACE_LANDMARKER_MODEL to a valid Face Landmarker .task file, or use a MediaPipe build exposing face_mesh."
+  },
+  "guard_detection": {
+    "status": "ok",
+    "calls": 349,
+    "successes": 349,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": null
+  },
+  "guard_detector_load": {
+    "status": "ok",
+    "calls": 349,
+    "successes": 349,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": "cached"
+  },
+  "guard_selection": {
+    "status": "ok",
+    "calls": 349,
+    "successes": 349,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": null
+  },
+  "movement": {
+    "status": "unknown",
+    "calls": 349,
+    "successes": 187,
+    "errors": 0,
+    "unknowns": 162,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": "no_current_guard"
+  },
+  "phone_detection": {
+    "status": "unknown",
+    "calls": 257,
+    "successes": 94,
+    "errors": 0,
+    "unknowns": 163,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": "no_current_guard"
+  },
+  "phone_load": {
+    "status": "ok",
+    "calls": 187,
+    "successes": 187,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": "cached"
+  },
+  "phone_use": {
+    "status": "unknown",
+    "calls": 349,
+    "successes": 186,
+    "errors": 0,
+    "unknowns": 163,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": "no_current_guard"
+  },
+  "pose": {
+    "status": "unknown",
+    "calls": 257,
+    "successes": 94,
+    "errors": 0,
+    "unknowns": 163,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": "no_current_guard"
+  },
+  "pose_load": {
+    "status": "ok",
+    "calls": 187,
+    "successes": 187,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": "cached"
+  },
+  "posture": {
+    "status": "unknown",
+    "calls": 349,
+    "successes": 186,
+    "errors": 0,
+    "unknowns": 163,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": "pose_unavailable"
+  },
+  "presence": {
+    "status": "ok",
+    "calls": 349,
+    "successes": 349,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": null
+  },
+  "rule_absence": {
+    "status": "ok",
+    "calls": 349,
+    "successes": 349,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": null
+  },
+  "rule_phone": {
+    "status": "ok",
+    "calls": 349,
+    "successes": 349,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": null
+  },
+  "rule_sleep": {
+    "status": "ok",
+    "calls": 349,
+    "successes": 349,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": null
+  },
+  "rule_stationary": {
+    "status": "ok",
+    "calls": 349,
+    "successes": 349,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": null
+  },
+  "sleep": {
+    "status": "unknown",
+    "calls": 349,
+    "successes": 187,
+    "errors": 0,
+    "unknowns": 162,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": "no_current_guard"
+  },
+  "tracker_load": {
+    "status": "ok",
+    "calls": 349,
+    "successes": 349,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": "cached"
+  },
+  "tracking": {
+    "status": "ok",
+    "calls": 349,
+    "successes": 349,
+    "errors": 0,
+    "unknowns": 0,
+    "disabled": 0,
+    "last_error": null,
+    "last_detail": null
+  }
+}
