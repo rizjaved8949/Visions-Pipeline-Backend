@@ -1,23 +1,40 @@
-Guard monitoring integration verification
+GUARD MONITORING CORRECTION VERIFICATION
+Build: guard-motion-sleep-fix-2026-09-24
 
-Verified after integrating into the uploaded Visions-Pipeline-Backend structure:
-- Guard_monotoring wrapper structure flattened to a single guard_monitoring/ package
-  at the repo root (matching the other pipeline modules) as part of a later reorg.
-- Existing launcher app.py retained; no second FastAPI app created.
-- Guard APIRouter registered in app.py, alongside the other pipeline modules.
-- One root .env retained and guard runtime-data paths point at local_data/guard.
-- One root requirements.txt retained, de-duplicated, with unpinned package names.
-- Fine-tuned RF-DETR checkpoint loading wired through RFDETR.from_checkpoint().
-- Checkpoint filename and trained class label are intentionally not guessed.
-- Python compileall passed.
-- Guard unit/failure-isolation tests passed: 8 passed.
-- Nested CLI --help passed from repository root.
-- Guard API import remained lazy: heavy CV model packages are not loaded by importing the router.
+Commands executed from the reconstructed backend package:
+  python -m compileall -q guard_monitoring
+  python -m unittest discover -s guard_monitoring/tests -p "test_regression_*.py" -q
+  python -m guard_monitoring.scripts.replay_recorded_sleep --output guard_monitoring/verification/recorded_sensor_replay.json
 
-Not verified because the required artifact was not uploaded:
-- Accuracy/inference of the user's actual fine-tuned RF-DETR checkpoint.
-- Exact trained class label inside that checkpoint.
-- Real CCTV accuracy on the user's local videos.
+Result: 103 regression tests; 98 passed, 5 skipped; zero failures/errors.
+Compilation passed. Final ZIP was also checked and overlaid onto the previous
+release to verify the installed package's imports and regression suite.
 
-Those require copying the user's downloaded checkpoint into guard_monitoring/weights/
-and setting GUARD_RFDETR_WEIGHTS in the root .env.
+Explicitly skipped because real OpenCV is unavailable:
+  test_overlay_draws_only_the_requested_text
+  test_no_status_is_drawn_without_evidence
+  test_background_translation_is_recovered
+  test_zero_identity_is_drawn_without_confidence
+  test_retained_box_has_last_seen_label
+
+These tests use deterministic state logic, numerical motion-quality checks,
+scripted models, and a recorded sensor fixture. They do not validate trained
+model accuracy. Existing rule/SQLite storage tests are exercised by wrappers.
+All seven requested scenario categories are represented by scripted tests.
+Actual video scenarios have NOT all been validated with real models here.
+
+Recorded sensor replay: 215 selected frames, 27 sleep candidates; first candidate
+5.208333s; first Sleeping display 5.625s. Maximum positive sleep timer 1.083333s.
+No event for the explicit 5-second replay threshold. The replay assumes unknown
+motion and no simulated camera cuts; old logs contain neither validated camera
+transforms nor guard boxes. It is not a video/model replay. See JSON report.
+
+Not executed: actual RFDETR/ByteTrack/YOLO/MediaPipe inference, actual optical
+flow/renderer pixels, full pytest/FastAPI tests, real RTSP cameras/reconnects,
+GPU or CPU throughput comparison. OpenCV, torch, rfdetr, ultralytics, mediapipe,
+trackers, FastAPI and pytest are unavailable. Model weights were not modified.
+No detector confidence or alert-duration reduction; no training/fine-tuning.
+
+The temporary workspace from the prior session was cleared. This correction
+was reconstructed from the saved first release and reviewed notes, then tested
+again. Counts above are from this reconstruction, not assumed prior results.

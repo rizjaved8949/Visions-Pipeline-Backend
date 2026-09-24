@@ -50,6 +50,13 @@ def point_in_polygon(point: Point, polygon: Iterable[Point]) -> bool:
     for i in range(len(pts)):
         xi, yi = pts[i]
         xj, yj = pts[j]
+        # Boundary points belong to the duty zone. A full-frame box often has
+        # its footpoint exactly on the bottom edge; it must remain selectable.
+        cross = (x - xi) * (yj - yi) - (y - yi) * (xj - xi)
+        tolerance = 1e-7 * max(1.0, abs(xj - xi), abs(yj - yi))
+        if (abs(cross) <= tolerance and min(xi, xj) - tolerance <= x <= max(xi, xj) + tolerance
+                and min(yi, yj) - tolerance <= y <= max(yi, yj) + tolerance):
+            return True
         intersects = ((yi > y) != (yj > y)) and (
             x < (xj - xi) * (y - yi) / ((yj - yi) + 1e-12) + xi
         )

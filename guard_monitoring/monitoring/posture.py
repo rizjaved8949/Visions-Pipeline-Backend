@@ -64,9 +64,11 @@ class PostureAnalyzer:
             torso_lean = math.degrees(math.atan2(abs(dx), max(abs(dy), 1e-6)))
 
         head_down = False
+        head_down_known = False
         if shoulder_center is not None and hip_center is not None and valid(NOSE):
             torso_len = float(np.linalg.norm(np.asarray(hip_center) - np.asarray(shoulder_center)))
             if torso_len > 1.0:
+                head_down_known = True
                 nose_y = point(NOSE)[1]
                 head_clearance = float(shoulder_center[1] - nose_y)
                 ratio = head_clearance / torso_len
@@ -78,4 +80,5 @@ class PostureAnalyzer:
             torso_lean_deg=torso_lean,
             left_knee_angle_deg=left_angle,
             right_knee_angle_deg=right_angle,
+            head_down_known=head_down_known,
         )

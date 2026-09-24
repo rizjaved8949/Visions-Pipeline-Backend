@@ -11,11 +11,14 @@ import cv2
 
 from .contracts import ModuleResult, ModuleStatus, disabled, error_result, ok, unknown
 from .events import JsonlWriter
+from .diagnostics import BUILD_ID, effective_config, runtime_info
 from .geometry import normalized_polygon_to_pixels
 from .health import ModuleHealthRegistry, safe_run
 from .io import make_writer, open_capture, video_metadata
 from .model_registry import LazyModelRegistry
 from .monitoring.guard_selector import GuardSelector
+from .monitoring.activity import ActivityStabilizer
+from .monitoring.camera_motion import CameraMotionEstimator
 from .monitoring.movement import MovementMonitor
 from .monitoring.phone_use import PhoneUseAnalyzer
 from .monitoring.posture import PostureAnalyzer
@@ -23,7 +26,7 @@ from .monitoring.presence import PresenceState, presence_from_tracker
 from .monitoring.rules import TimedRuleEngine
 from .monitoring.sleep import SleepAnalyzer
 from .types import EyeState, MovementState, PhoneState, PostureState, SleepState
-from .visualization.overlay import draw_box, draw_polygon, draw_pose, draw_status_panel
+from .visualization.overlay import draw_activity_status, draw_guard_identity
 
 ProgressCallback = Callable[[dict], None]
 
@@ -71,6 +74,9 @@ class GuardMonitoringPipeline:
         sleep_cfg.setdefault("torso_lean_deg", cfg["pose_logic"].get("torso_lean_deg", 28.0))
         self.sleep_analyzer = SleepAnalyzer(sleep_cfg)
 
+        self.activity = ActivityStabilizer(cfg.get("activity", {}))
+        self.camera_motion = CameraMotionEstimator(cfg.get("camera_motion", {}))
+        self.last_identity = None
         self.last_track_id = None
         self.last_pose: ModuleResult = unknown("pose_not_run")
         self.last_pose_frame = -10**9
@@ -78,6 +84,8 @@ class GuardMonitoringPipeline:
         self.last_phone_frame = -10**9
         self.last_eye: ModuleResult = unknown("eyes_not_run")
         self.last_eye_frame = -10**9
+        self.last_pose_at = self.last_phone_at = self.last_eye_at = None
+        self.last_eye_timestamp_ms = -1
 
     def run(self) -> dict:
         source = str(self.cfg["input"]["source"])
@@ -100,6 +108,8 @@ class GuardMonitoringPipeline:
         if max_frames is not None:
             total_frames = min(raw_total, int(max_frames)) if raw_total > 0 else int(max_frames)
 
+        config_path = out_dir / "runtime_config.json"
+        config_path.write_text(json.dumps({"build_id": BUILD_ID, "effective_config": effective_config(self.cfg)}, indent=2), encoding="utf-8")
         writer = make_writer(video_path, width, height, fps)
         self.latest_frame = out_dir / "latest.jpg"
 
@@ -115,6 +125,7 @@ class GuardMonitoringPipeline:
             release_seconds=sel_cfg.get("release_seconds", 5.0),
             presence_grace_seconds=sel_cfg.get("presence_grace_seconds", 2.0),
             manual_track_id=sel_cfg.get("manual_track_id"),
+            candidate_gap_seconds=max(sel_cfg.get("candidate_gap_seconds", 0.5), 1.5 / fps),
         )
         move_cfg = self.cfg["movement"]
         movement_monitor = MovementMonitor(
@@ -122,6 +133,11 @@ class GuardMonitoringPipeline:
             stationary_radius_ratio=move_cfg.get("stationary_radius_ratio", 0.035),
             minimum_history_seconds=move_cfg.get("minimum_history_seconds", 2.0),
             patrol_zones=patrol_zones,
+            smoothing_seconds=move_cfg.get("smoothing_seconds", 0.25),
+            radius_quantile=move_cfg.get("radius_quantile", 0.90),
+            max_gap_seconds=move_cfg.get("max_gap_seconds", 2.0),
+            border_margin_ratio=move_cfg.get("border_margin_ratio", 0.015),
+            max_box_scale_change=move_cfg.get("max_box_scale_change", 0.25),
         )
         rules = TimedRuleEngine(self.camera_id, self.cfg["rules"])
 
@@ -144,7 +160,9 @@ class GuardMonitoringPipeline:
         with JsonlWriter(frame_log_path) as frame_log, JsonlWriter(event_log_path) as event_log:
             try:
                 while True:
+                    decode_started = time.perf_counter()
                     ok_read, frame = cap.read()
+                    self.health.record("video_decode", ok(ok_read), (time.perf_counter()-decode_started)*1000.0)
                     if not ok_read:
                         break
                     if max_frames is not None and frame_count >= int(max_frames):
@@ -166,6 +184,9 @@ class GuardMonitoringPipeline:
                         # Last-resort frame isolation. Normal module errors should already
                         # be contained by safe_run; this catches orchestration bugs.
                         frame_errors += 1
+                        rules.pause_all(now)
+                        self.sleep_analyzer.pause(now)
+                        self.activity.update(None, now, present=None)
                         fatal_result = error_result(exc)
                         self.health.record("frame_pipeline", fatal_result)
                         if not continue_on_frame_error:
@@ -197,8 +218,12 @@ class GuardMonitoringPipeline:
                     for event in result["events"]:
                         event_log.write(event)
 
+                    encode_started = time.perf_counter()
                     writer.write(result["annotated"])
+                    self.health.record("video_encode", ok(None), (time.perf_counter()-encode_started)*1000.0)
+                    preview_started = time.perf_counter()
                     self._write_latest_frame(result["annotated"])
+                    self.health.record("preview_write", ok(None), (time.perf_counter()-preview_started)*1000.0)
                     frame_log.write(result["frame_log"])
 
                     if display:
@@ -212,6 +237,7 @@ class GuardMonitoringPipeline:
             finally:
                 cap.release()
                 writer.release()
+                self.close()
                 self.latest_frame.unlink(missing_ok=True)
                 if display:
                     cv2.destroyAllWindows()
@@ -219,7 +245,15 @@ class GuardMonitoringPipeline:
         health_snapshot = self.health.snapshot()
         health_path.write_text(json.dumps(health_snapshot, indent=2), encoding="utf-8")
 
+        wall_seconds = time.time() - started_wall
         summary = {
+            "build_id": BUILD_ID,
+            "processing_fps": round(frame_count / max(wall_seconds, 1e-9), 4),
+            "video_seconds": round(frame_count / fps, 3),
+            "effective_config": effective_config(self.cfg),
+            "runtime": runtime_info(self.registry),
+            "stage_timings_ms": self.health.timing_totals(),
+            "runtime_config": str(config_path),
             "camera_id": self.camera_id,
             "source": source,
             "fps": fps,
@@ -233,7 +267,7 @@ class GuardMonitoringPipeline:
             "stationary_frames": stationary_frames,
             "absence_frames": absence_frames,
             "events_triggered": events_count,
-            "processing_wall_seconds": round(time.time() - started_wall, 3),
+            "processing_wall_seconds": round(wall_seconds, 3),
             "output_video": str(video_path),
             "frame_log": str(frame_log_path),
             "event_log": str(event_log_path),
@@ -272,6 +306,8 @@ class GuardMonitoringPipeline:
         duty_zone,
         patrol_zones,
     ) -> dict:
+        frame_started = time.perf_counter()
+        timings_before = self.health.timing_totals()
         module_results: dict[str, ModuleResult] = {}
 
         # STEP 1 - detector
@@ -286,6 +322,30 @@ class GuardMonitoringPipeline:
         else:
             detections = self._propagate("guard_detection", det_model)
         module_results["guard_detection"] = detections
+
+        boxes = getattr(detections.value, "xyxy", []) if detections.ok else []
+        camera_started = time.perf_counter()
+        camera_motion = safe_run("camera_motion", self.camera_motion.update, frame, boxes, now)
+        camera_state = camera_motion.value if camera_motion.ok else self.camera_motion.state("error")
+        if camera_motion.ok and not camera_state.get("enabled"):
+            camera_motion = disabled("camera_motion_disabled")
+        elif camera_motion.ok and not camera_state.get("valid"):
+            camera_motion = unknown(camera_state.get("reason", "unresolved"))
+        self.health.record("camera_motion", camera_motion, (time.perf_counter()-camera_started)*1000.0)
+        module_results["camera_motion"] = camera_motion
+        scene_change = bool(camera_state.get("scene_change"))
+        if scene_change:
+            # A cut makes identity across the discontinuity unverified.
+            self.registry.reset_tracker()
+            selector.reset()
+            self._reset_guard_dependent_state(None)
+            self.last_identity = None
+            movement_monitor.reset(None)
+            rules.reset_guard(None)
+        elif camera_state.get("valid"):
+            movement_monitor.compensate(camera_state["affine"])
+        elif not self.cfg["movement"].get("assume_static_camera", False):
+            movement_monitor.invalidate()
 
         # STEP 2 - tracker. Tracking is not run when detection evidence is unavailable.
         if detections.ok:
@@ -325,12 +385,23 @@ class GuardMonitoringPipeline:
             presence_result = self._unknown_recorded("presence", "guard_selection_unavailable")
         module_results["presence"] = presence_result
 
-        guard = guard_result.value if guard_result.ok else None
+        guard = guard_result.value if guard_result.ok else selector.retained(now)
         present = presence_result.value.present if presence_result.ok else None
+        if scene_change:
+            # Do not count a camera cut as absence or as observed rule duration.
+            present = None
 
-        if guard is not None and guard.track_id != self.last_track_id:
+        identity = (guard.track_id, selector.generation) if guard is not None else None
+        if identity is not None and identity != self.last_identity:
             self._reset_guard_dependent_state(guard.track_id)
+            self.last_identity = identity
             movement_monitor.reset(guard.track_id)
+            rules.reset_guard(guard.track_id)
+        elif guard is None and selector.active_id is None and self.last_identity is not None:
+            self._reset_guard_dependent_state(None)
+            self.last_identity = None
+            movement_monitor.reset(None)
+            rules.reset_guard(None)
 
         # Defaults are neutral/unknown values. Status metadata determines whether a
         # rule is allowed to consume them.
@@ -357,13 +428,16 @@ class GuardMonitoringPipeline:
                 guard.track_id,
                 guard.bbox,
                 now,
+                frame_shape=frame.shape,
+                camera_state=camera_state,
+                assume_static_camera=self.cfg["movement"].get("assume_static_camera", False),
                 health=self.health,
             )
             if movement_result.ok:
                 movement = movement_result.value
 
             # STEP 4 - pose. A pose failure does not stop phone detection or eyes.
-            pose_result = self._get_pose(frame, guard.bbox, frame_idx)
+            pose_result = self._get_pose(frame, guard.bbox, frame_idx, now)
             pose_obs = pose_result.value if pose_result.ok else None
             if pose_result.ok and pose_obs is not None:
                 posture_result = safe_run(
@@ -381,7 +455,7 @@ class GuardMonitoringPipeline:
 
             # STEP 5 - phone detector is independent from pose; pose only improves the
             # call/screen-use association heuristic.
-            phone_detection_result = self._get_phone_detections(frame, guard.bbox, frame_idx)
+            phone_detection_result = self._get_phone_detections(frame, guard.bbox, frame_idx, now)
             if phone_detection_result.ok:
                 phone_use_result = safe_run(
                     "phone_use",
@@ -405,6 +479,7 @@ class GuardMonitoringPipeline:
                 guard.bbox,
                 pose_obs.keypoints if pose_obs is not None else None,
                 frame_idx,
+                now,
             )
             if eye_result.ok:
                 eye = eye_result.value
@@ -437,6 +512,11 @@ class GuardMonitoringPipeline:
             self.last_eye = unknown("guard_absent")
 
         if not guard_seen_now:
+            self.sleep_analyzer.pause(now)
+            # Re-observation must use a fresh crop, not a crop from before the gap.
+            self.last_pose = unknown("tracking_gap")
+            self.last_phone_detections = unknown("tracking_gap")
+            self.last_eye = unknown("tracking_gap")
             for module_name, module_result in (
                 ("movement", movement_result),
                 ("pose", pose_result),
@@ -467,21 +547,27 @@ class GuardMonitoringPipeline:
         )
         sleep_condition = None
         if present is True and sleep_result.ok:
-            sleep_condition = bool(
-                sleep.candidate
-                and (sleep.evidence_quality == "high" or allow_degraded_sleep)
-            )
+            if sleep.candidate and (sleep.evidence_quality == "high" or allow_degraded_sleep):
+                sleep_condition = True
+            elif not sleep.candidate and sleep.evidence_quality == "high":
+                sleep_condition = False
+            # Insufficient/disabled evidence is unknown, not evidence of wakefulness.
         elif present is False:
             sleep_condition = False
 
         phone_condition = None
         if present is True and phone_use_result.ok:
-            phone_condition = bool(phone.usage in {"call", "screen_use"})
+            if phone.usage in {"call", "screen_use"}:
+                phone_condition = True
+            elif phone.detected and phone.usage == "visible" and not posture_result.ok:
+                phone_condition = None
+            else:
+                phone_condition = False
         elif present is False:
             phone_condition = False
 
         stationary_condition = None
-        if present is True and movement_result.ok:
+        if present is True and movement_result.ok and movement.reliable:
             stationary_condition = bool(movement.stationary)
         elif present is False:
             stationary_condition = False
@@ -511,8 +597,32 @@ class GuardMonitoringPipeline:
             if event_result.ok and event_result.value is not None:
                 events.append(event_result.value.to_dict())
 
+        candidate = None
+        if guard_seen_now:
+            if phone_condition is True:
+                candidate = "Using Mobile"
+            elif sleep_condition is True:
+                candidate = "Sleeping"
+            elif stationary_condition is not None:
+                # Activity meaning for a guard is duty behavior, not only box jitter:
+                # - standing guard = active duty -> Moving
+                # - walking patrol = Moving
+                # - sitting/holding position = Stationary
+                # Sleep and phone have already been handled above.
+                waiting = ((self.activity.label == "Sleeping" and sleep_condition is None
+                            and stationary_condition is True)
+                           or (self.activity.label == "Using Mobile" and phone_condition is None))
+                if not waiting:
+                    if posture.posture == "standing":
+                        candidate = "Moving"
+                    elif posture.posture == "sitting" and movement.reliable:
+                        candidate = "Stationary"
+                    else:
+                        candidate = "Stationary" if stationary_condition else "Moving"
+        activity = self.activity.update(candidate, now, present=present)
         annotated = frame.copy()
-        self._draw(
+        rendering = safe_run(
+            "visualization", self._draw,
             annotated,
             tracked.value if tracked.ok else None,
             guard,
@@ -526,14 +636,31 @@ class GuardMonitoringPipeline:
             rules,
             module_results,
             present,
+            health=self.health,
         )
+        module_results["visualization"] = rendering
 
         frame_log = {
+            "build_id": BUILD_ID,
+            "guard_bbox": list(guard.bbox) if guard is not None else None,
+            "guard_confidence": guard.confidence if guard is not None else None,
+            "camera_motion": camera_state,
+            "activity_candidate": candidate,
+            "sensor_timestamps": {"pose": self.last_pose_at, "phone": self.last_phone_at, "eyes": self.last_eye_at},
+            "pose_keypoints": (pose_result.value.keypoints.tolist() if pose_result.ok and pose_result.value is not None else None),
+            "timings_ms": self.health.timings_since(timings_before),
+            "frame_processing_ms": round((time.perf_counter()-frame_started)*1000.0, 3),
             "frame": frame_idx,
             "time_seconds": now,
             "frame_status": "ok",
             "guard_track_id": selector.active_id,
             "guard_seen_now": guard_seen_now,
+            "guard_observation": "observed" if guard_seen_now else ("retained" if guard else "missing"),
+            "activity_status": activity["label"],
+            "activity": activity,
+            "rule_durations_seconds": {
+                name: rules.active_duration(name, now) for name in rule_conditions
+            },
             "present": present,
             "movement": asdict(movement),
             "posture": asdict(posture),
@@ -568,59 +695,67 @@ class GuardMonitoringPipeline:
         self.last_eye = unknown("new_guard")
         self.last_eye_frame = -10**9
         self.sleep_analyzer.reset(track_id)
+        self.activity.reset()
+        self.last_pose_at = self.last_phone_at = self.last_eye_at = None
 
-    def _get_pose(self, frame, guard_box, frame_idx) -> ModuleResult:
-        load = self.registry.pose()
+    def _sample_sensor(self, name, frame_idx, now, invoke) -> ModuleResult:
+        cfg_name = "eyes" if name == "eye" else name
+        config = self.cfg["models"][cfg_name]
+        result_name = {"pose": "last_pose", "phone": "last_phone_detections", "eye": "last_eye"}[name]
+        health_name = {"pose": "pose", "phone": "phone_detection", "eye": "eyes"}[name]
+        load = getattr(self.registry, cfg_name)()
         if not load.ok:
-            return self._propagate("pose", load)
-        if frame_idx % self.pose_stride == 0:
-            self.last_pose = safe_run(
-                "pose",
-                load.value.predict,
-                frame,
-                guard_box,
-                health=self.health,
-            )
-            self.last_pose_frame = frame_idx
-        if frame_idx - self.last_pose_frame <= self.pose_cache_max:
-            return self.last_pose
-        return self._unknown_recorded("pose", "pose_cache_expired")
+            return self._propagate(health_name, load)
+        previous = getattr(self, result_name)
+        last_time = getattr(self, f"last_{name}_at")
+        last_frame = getattr(self, f"last_{name}_frame")
+        stride = getattr(self, f"{name}_stride")
+        max_frames = getattr(self, f"{name}_cache_max")
+        expired = (last_time is None or now - last_time > config.get("cache_max_seconds", 0.75)
+                   or frame_idx - last_frame > max_frames)
+        if frame_idx % stride == 0 or not previous.ok or expired:
+            result = safe_run(health_name, invoke, load.value, health=self.health)
+            if name == "eye" and result.ok and result.value is not None:
+                result.value.observed_at = now
+            setattr(self, result_name, result)
+            setattr(self, f"last_{name}_frame", frame_idx)
+            setattr(self, f"last_{name}_at", now)
+            return result
+        return previous
 
-    def _get_phone_detections(self, frame, guard_box, frame_idx) -> ModuleResult:
-        load = self.registry.phone()
-        if not load.ok:
-            return self._propagate("phone_detection", load)
-        if frame_idx % self.phone_stride == 0:
-            self.last_phone_detections = safe_run(
-                "phone_detection",
-                load.value.predict,
-                frame,
-                guard_box,
-                health=self.health,
-            )
-            self.last_phone_frame = frame_idx
-        if frame_idx - self.last_phone_frame <= self.phone_cache_max:
-            return self.last_phone_detections
-        return self._unknown_recorded("phone_detection", "phone_cache_expired")
+    def _get_pose(self, frame, guard_box, frame_idx, now=None) -> ModuleResult:
+        now = frame_idx / max(1.0, getattr(self, "video_fps", 30.0)) if now is None else now
+        return self._sample_sensor("pose", frame_idx, now,
+                                   lambda model: model.predict(frame, guard_box))
 
-    def _get_eye_state(self, frame, guard_box, keypoints, frame_idx) -> ModuleResult:
-        load = self.registry.eyes()
-        if not load.ok:
-            return self._propagate("eyes", load)
-        if frame_idx % self.eye_stride == 0:
-            self.last_eye = safe_run(
-                "eyes",
-                load.value.analyze,
-                frame,
-                guard_box,
-                keypoints,
-                int(frame_idx * 1000.0 / max(1.0, getattr(self, "video_fps", 30.0))),
-                health=self.health,
-            )
-            self.last_eye_frame = frame_idx
-        if frame_idx - self.last_eye_frame <= self.eye_cache_max:
-            return self.last_eye
-        return self._unknown_recorded("eyes", "eye_cache_expired")
+    def _get_phone_detections(self, frame, guard_box, frame_idx, now=None) -> ModuleResult:
+        now = frame_idx / max(1.0, getattr(self, "video_fps", 30.0)) if now is None else now
+        return self._sample_sensor("phone", frame_idx, now,
+                                   lambda model: model.predict(frame, guard_box))
+
+    def _get_eye_state(self, frame, guard_box, keypoints, frame_idx, now=None) -> ModuleResult:
+        now = frame_idx / max(1.0, getattr(self, "video_fps", 30.0)) if now is None else now
+        def invoke(model):
+            timestamp = max(self.last_eye_timestamp_ms + 1, int(now * 1000.0))
+            self.last_eye_timestamp_ms = timestamp
+            return model.analyze(frame, guard_box, keypoints, timestamp)
+        return self._sample_sensor("eye", frame_idx, now, invoke)
+
+    def reset_stream(self):
+        """A reconnection begins a new observation episode, never a stale one."""
+        if hasattr(self.registry, "reset_tracker"):
+            self.registry.reset_tracker()
+        if hasattr(self.registry, "close"):
+            self.registry.close()
+        self._reset_guard_dependent_state(None)
+        self.last_identity = None
+        self.camera_motion.reset()
+        self.last_eye_timestamp_ms = -1
+
+
+    def close(self):
+        if hasattr(self.registry, "close"):
+            self.registry.close()
 
     def _propagate(self, module_name: str, source: ModuleResult) -> ModuleResult:
         result = ModuleResult(
@@ -665,77 +800,14 @@ class GuardMonitoringPipeline:
             },
         }
 
-    def _draw(
-        self,
-        frame,
-        tracked,
-        guard,
-        duty_zone,
-        patrol_zones,
-        posture,
-        movement,
-        phone,
-        eye,
-        sleep,
-        rules,
-        module_results,
-        present,
-    ):
-        viz = self.cfg["visualization"]
-        if viz.get("draw_zones", True):
-            draw_polygon(frame, duty_zone, "duty zone")
-            for name, polygon in patrol_zones:
-                draw_polygon(frame, polygon, name)
-
-        tracker_ids = getattr(tracked, "tracker_id", None) if tracked is not None else None
-        if tracker_ids is not None:
-            for idx, tid in enumerate(tracker_ids):
-                if tid is None or int(tid) < 0:
-                    continue
-                box = tuple(float(v) for v in tracked.xyxy[idx])
-                is_guard = guard is not None and int(tid) == guard.track_id
-                label = f"GUARD ID {int(tid)}" if is_guard else f"person ID {int(tid)}"
-                color = (0, 255, 0) if is_guard else (150, 150, 150)
-                draw_box(frame, box, label, color=color, thickness=2 if is_guard else 1)
-
-        pose_value = self.last_pose.value if self.last_pose.ok else None
-        if guard is not None and pose_value is not None and viz.get("draw_pose", True):
-            draw_pose(
-                frame,
-                pose_value.keypoints,
-                self.cfg["pose_logic"].get("keypoint_confidence", 0.25),
-            )
-        if phone.bbox is not None and viz.get("draw_phone", True):
-            draw_box(frame, phone.bbox, f"phone: {phone.usage}", color=(255, 0, 255), thickness=2)
-
-        if viz.get("draw_panel", True):
-            errors = [
-                name for name, result in module_results.items()
-                if result.status is ModuleStatus.ERROR
-            ]
-            unknowns = [
-                name for name, result in module_results.items()
-                if result.status is ModuleStatus.UNKNOWN
-            ]
-            lines = [
-                f"Guard ID: {guard.track_id if guard else 'none'} | present={present}",
-                f"Movement: {'stationary' if movement.stationary else 'moving/unknown'}",
-                f"Patrol coverage: {self._fmt_ratio(movement.patrol_coverage_ratio)}",
-                f"Posture: {posture.posture} | head-down={posture.head_down}",
-                f"Phone: {phone.usage} | detected={phone.detected}",
-                f"Eyes: {self._eye_text(eye)}",
-                (
-                    f"Sleep evidence: {sleep.candidate} | quality={sleep.evidence_quality} "
-                    f"| score={sleep.score:.2f} | PERCLOS={self._fmt_ratio(sleep.perclos)}"
-                ),
-                f"Module errors: {', '.join(errors) if errors else 'none'}",
-                f"Unknown modules: {', '.join(unknowns[:4]) if unknowns else 'none'}",
-            ]
-            alerts = [
-                name for name in ("sleep", "phone", "stationary", "absence")
-                if rules.is_triggered(name)
-            ]
-            draw_status_panel(frame, lines, alerts)
+    def _draw(self, frame, tracked, guard, duty_zone, patrol_zones, posture,
+              movement, phone, eye, sleep, rules, module_results, present):
+        # Drawing reads state only; it never changes observations or event timers.
+        if guard is not None and present is True:
+            viz = self.cfg.get("visualization", {})
+            draw_guard_identity(frame, guard, show_box=viz.get("draw_guard_box", True),
+                                show_id=viz.get("draw_guard_id", True))
+            draw_activity_status(frame, self.activity.label, bbox=guard.bbox)
 
     def _maybe_progress(self, processed: int, total: int) -> None:
         every = max(1, int(self.cfg.get("api", {}).get("progress_every_frames", 25)))

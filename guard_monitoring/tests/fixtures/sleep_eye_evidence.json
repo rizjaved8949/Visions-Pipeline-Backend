@@ -1,0 +1,6455 @@
+{
+  "description": "Recorded sensor-only regression fixture. Original logs lack boxes/camera transforms. Motion is explicitly unknown in this replay; this is not a video inference test.",
+  "frames": [
+    {
+      "time_seconds": 1.0416666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.23006014738253858,
+        "ear_right": 0.2452127075175158,
+        "ear_mean": 0.2376364274500272,
+        "reason": "ok",
+        "observed_at": 1.0416666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.3931686527964756,
+        "left_knee_angle_deg": 123.93826921451156,
+        "right_knee_angle_deg": 89.19072330869426,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.0833333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.2659232852561699,
+        "ear_right": 0.25749673100829557,
+        "ear_mean": 0.2617100081322327,
+        "reason": "ok",
+        "observed_at": 1.0833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.37767135423703835,
+        "left_knee_angle_deg": 122.87691335037007,
+        "right_knee_angle_deg": 88.67845082264267,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.125,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.2659232852561699,
+        "ear_right": 0.25749673100829557,
+        "ear_mean": 0.2617100081322327,
+        "reason": "ok",
+        "observed_at": 1.0833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.37767135423703835,
+        "left_knee_angle_deg": 122.87691335037007,
+        "right_knee_angle_deg": 88.67845082264267,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.1666666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.22528987328557512,
+        "ear_right": 0.203463478867763,
+        "ear_mean": 0.21437667607666905,
+        "reason": "ok",
+        "observed_at": 1.1666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.8777649084705886,
+        "left_knee_angle_deg": 123.4469793023394,
+        "right_knee_angle_deg": 88.06462588172067,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.2083333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.22528987328557512,
+        "ear_right": 0.203463478867763,
+        "ear_mean": 0.21437667607666905,
+        "reason": "ok",
+        "observed_at": 1.1666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.8777649084705886,
+        "left_knee_angle_deg": 123.4469793023394,
+        "right_knee_angle_deg": 88.06462588172067,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.25,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 1.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.7884971037787959,
+        "left_knee_angle_deg": 121.51057113884686,
+        "right_knee_angle_deg": 87.65617523729561,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.2916666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 1.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.7884971037787959,
+        "left_knee_angle_deg": 121.51057113884686,
+        "right_knee_angle_deg": 87.65617523729561,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.3333333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.2280289878815214,
+        "ear_right": 0.2345521003940595,
+        "ear_mean": 0.23129054413779043,
+        "reason": "ok",
+        "observed_at": 1.3333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.9071432254898925,
+        "left_knee_angle_deg": 121.01720138608286,
+        "right_knee_angle_deg": 88.09516014695981,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.375,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.2280289878815214,
+        "ear_right": 0.2345521003940595,
+        "ear_mean": 0.23129054413779043,
+        "reason": "ok",
+        "observed_at": 1.3333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.9071432254898925,
+        "left_knee_angle_deg": 121.01720138608286,
+        "right_knee_angle_deg": 88.09516014695981,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.4166666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.2112822881106857,
+        "ear_right": 0.20825217931762968,
+        "ear_mean": 0.20976723371415767,
+        "reason": "ok",
+        "observed_at": 1.4166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.5409240341726615,
+        "left_knee_angle_deg": 121.37371932689156,
+        "right_knee_angle_deg": 87.75654986487248,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.4583333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.2112822881106857,
+        "ear_right": 0.20825217931762968,
+        "ear_mean": 0.20976723371415767,
+        "reason": "ok",
+        "observed_at": 1.4166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "sitting",
+        "head_down": false,
+        "torso_lean_deg": 0.5409240341726615,
+        "left_knee_angle_deg": 121.37371932689156,
+        "right_knee_angle_deg": 87.75654986487248,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.5,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 1.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.405499626400179,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.5416666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 1.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.405499626400179,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.5833333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.04894958173307918,
+        "ear_right": 0.14321164288435237,
+        "ear_mean": 0.09608061230871577,
+        "reason": "ok",
+        "observed_at": 1.5833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.218744045934137,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.625,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.04894958173307918,
+        "ear_right": 0.14321164288435237,
+        "ear_mean": 0.09608061230871577,
+        "reason": "ok",
+        "observed_at": 1.5833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.218744045934137,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.6666666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08375677841866655,
+        "ear_right": 0.1352797444297473,
+        "ear_mean": 0.10951826142420693,
+        "reason": "ok",
+        "observed_at": 1.6666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.6520696931462,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.7083333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08375677841866655,
+        "ear_right": 0.1352797444297473,
+        "ear_mean": 0.10951826142420693,
+        "reason": "ok",
+        "observed_at": 1.6666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.6520696931462,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.75,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07447823281107666,
+        "ear_right": 0.13756053028789794,
+        "ear_mean": 0.1060193815494873,
+        "reason": "ok",
+        "observed_at": 1.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.582479327185466,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.7916666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07447823281107666,
+        "ear_right": 0.13756053028789794,
+        "ear_mean": 0.1060193815494873,
+        "reason": "ok",
+        "observed_at": 1.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.582479327185466,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.8333333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10776657118660041,
+        "ear_right": 0.15173910179211708,
+        "ear_mean": 0.12975283648935876,
+        "reason": "ok",
+        "observed_at": 1.8333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.67540269414622,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.875,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10776657118660041,
+        "ear_right": 0.15173910179211708,
+        "ear_mean": 0.12975283648935876,
+        "reason": "ok",
+        "observed_at": 1.8333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.67540269414622,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.9166666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.1036872553890367,
+        "ear_right": 0.1568560370480882,
+        "ear_mean": 0.13027164621856246,
+        "reason": "ok",
+        "observed_at": 1.9166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 11.02478217869698,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 1.9583333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.1036872553890367,
+        "ear_right": 0.1568560370480882,
+        "ear_mean": 0.13027164621856246,
+        "reason": "ok",
+        "observed_at": 1.9166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 11.02478217869698,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 2.0,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09285891704720904,
+        "ear_right": 0.14885167328704266,
+        "ear_mean": 0.12085529516712584,
+        "reason": "ok",
+        "observed_at": 2.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.967234238914624,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 2.0416666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09285891704720904,
+        "ear_right": 0.14885167328704266,
+        "ear_mean": 0.12085529516712584,
+        "reason": "ok",
+        "observed_at": 2.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 10.967234238914624,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 2.0833333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09656417963257041,
+        "ear_right": 0.1555378607171545,
+        "ear_mean": 0.12605102017486247,
+        "reason": "ok",
+        "observed_at": 2.0833333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.125,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09656417963257041,
+        "ear_right": 0.1555378607171545,
+        "ear_mean": 0.12605102017486247,
+        "reason": "ok",
+        "observed_at": 2.0833333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.1666666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09452335947989506,
+        "ear_right": 0.14154938439694978,
+        "ear_mean": 0.11803637193842242,
+        "reason": "ok",
+        "observed_at": 2.1666666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 11.097211858916847,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 2.2083333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09452335947989506,
+        "ear_right": 0.14154938439694978,
+        "ear_mean": 0.11803637193842242,
+        "reason": "ok",
+        "observed_at": 2.1666666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 11.097211858916847,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 2.25,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08247444540552262,
+        "ear_right": 0.13899245735966315,
+        "ear_mean": 0.11073345138259288,
+        "reason": "ok",
+        "observed_at": 2.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.2916666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08247444540552262,
+        "ear_right": 0.13899245735966315,
+        "ear_mean": 0.11073345138259288,
+        "reason": "ok",
+        "observed_at": 2.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.3333333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08242746195490865,
+        "ear_right": 0.13079930517759975,
+        "ear_mean": 0.10661338356625419,
+        "reason": "ok",
+        "observed_at": 2.3333333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.375,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08242746195490865,
+        "ear_right": 0.13079930517759975,
+        "ear_mean": 0.10661338356625419,
+        "reason": "ok",
+        "observed_at": 2.3333333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.4166666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10169234106248763,
+        "ear_right": 0.13754234092236567,
+        "ear_mean": 0.11961734099242666,
+        "reason": "ok",
+        "observed_at": 2.4166666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.4583333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10169234106248763,
+        "ear_right": 0.13754234092236567,
+        "ear_mean": 0.11961734099242666,
+        "reason": "ok",
+        "observed_at": 2.4166666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.5,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.06860833666423231,
+        "ear_right": 0.12427719284674685,
+        "ear_mean": 0.09644276475548957,
+        "reason": "ok",
+        "observed_at": 2.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.5416666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.06860833666423231,
+        "ear_right": 0.12427719284674685,
+        "ear_mean": 0.09644276475548957,
+        "reason": "ok",
+        "observed_at": 2.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.5833333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08383341196420571,
+        "ear_right": 0.14739105523450238,
+        "ear_mean": 0.11561223359935405,
+        "reason": "ok",
+        "observed_at": 2.5833333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.625,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08383341196420571,
+        "ear_right": 0.14739105523450238,
+        "ear_mean": 0.11561223359935405,
+        "reason": "ok",
+        "observed_at": 2.5833333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.6666666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0846172360202957,
+        "ear_right": 0.13007537837237995,
+        "ear_mean": 0.10734630719633782,
+        "reason": "ok",
+        "observed_at": 2.6666666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.7083333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0846172360202957,
+        "ear_right": 0.13007537837237995,
+        "ear_mean": 0.10734630719633782,
+        "reason": "ok",
+        "observed_at": 2.6666666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.75,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08189520024687333,
+        "ear_right": 0.12584398589771695,
+        "ear_mean": 0.10386959307229514,
+        "reason": "ok",
+        "observed_at": 2.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.7916666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08189520024687333,
+        "ear_right": 0.12584398589771695,
+        "ear_mean": 0.10386959307229514,
+        "reason": "ok",
+        "observed_at": 2.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.8333333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07764174100602428,
+        "ear_right": 0.1147227070054198,
+        "ear_mean": 0.09618222400572204,
+        "reason": "ok",
+        "observed_at": 2.8333333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.875,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07764174100602428,
+        "ear_right": 0.1147227070054198,
+        "ear_mean": 0.09618222400572204,
+        "reason": "ok",
+        "observed_at": 2.8333333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.9166666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0767279642526966,
+        "ear_right": 0.11173816853795339,
+        "ear_mean": 0.094233066395325,
+        "reason": "ok",
+        "observed_at": 2.9166666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 2.9583333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0767279642526966,
+        "ear_right": 0.11173816853795339,
+        "ear_mean": 0.094233066395325,
+        "reason": "ok",
+        "observed_at": 2.9166666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.0,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07517424743618822,
+        "ear_right": 0.1150089379732679,
+        "ear_mean": 0.09509159270472806,
+        "reason": "ok",
+        "observed_at": 3.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.0416666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07517424743618822,
+        "ear_right": 0.1150089379732679,
+        "ear_mean": 0.09509159270472806,
+        "reason": "ok",
+        "observed_at": 3.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.0833333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08695974233181678,
+        "ear_right": 0.12032041135901873,
+        "ear_mean": 0.10364007684541776,
+        "reason": "ok",
+        "observed_at": 3.0833333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.125,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08695974233181678,
+        "ear_right": 0.12032041135901873,
+        "ear_mean": 0.10364007684541776,
+        "reason": "ok",
+        "observed_at": 3.0833333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.1666666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08570572479477491,
+        "ear_right": 0.13272675083399532,
+        "ear_mean": 0.10921623781438511,
+        "reason": "ok",
+        "observed_at": 3.1666666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.2083333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08570572479477491,
+        "ear_right": 0.13272675083399532,
+        "ear_mean": 0.10921623781438511,
+        "reason": "ok",
+        "observed_at": 3.1666666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.25,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0849224296359673,
+        "ear_right": 0.12859626017923473,
+        "ear_mean": 0.10675934490760101,
+        "reason": "ok",
+        "observed_at": 3.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.2916666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0849224296359673,
+        "ear_right": 0.12859626017923473,
+        "ear_mean": 0.10675934490760101,
+        "reason": "ok",
+        "observed_at": 3.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.3333333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07402282193007861,
+        "ear_right": 0.12765093742878272,
+        "ear_mean": 0.10083687967943067,
+        "reason": "ok",
+        "observed_at": 3.3333333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.375,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07402282193007861,
+        "ear_right": 0.12765093742878272,
+        "ear_mean": 0.10083687967943067,
+        "reason": "ok",
+        "observed_at": 3.3333333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.4166666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07494247446616412,
+        "ear_right": 0.11586686539342768,
+        "ear_mean": 0.0954046699297959,
+        "reason": "ok",
+        "observed_at": 3.4166666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.4583333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07494247446616412,
+        "ear_right": 0.11586686539342768,
+        "ear_mean": 0.0954046699297959,
+        "reason": "ok",
+        "observed_at": 3.4166666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.5,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07484280172875876,
+        "ear_right": 0.12421301809196582,
+        "ear_mean": 0.09952790991036228,
+        "reason": "ok",
+        "observed_at": 3.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.5416666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07484280172875876,
+        "ear_right": 0.12421301809196582,
+        "ear_mean": 0.09952790991036228,
+        "reason": "ok",
+        "observed_at": 3.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.5833333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07472680129624366,
+        "ear_right": 0.12729252562983384,
+        "ear_mean": 0.10100966346303875,
+        "reason": "ok",
+        "observed_at": 3.5833333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.625,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07472680129624366,
+        "ear_right": 0.12729252562983384,
+        "ear_mean": 0.10100966346303875,
+        "reason": "ok",
+        "observed_at": 3.5833333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.6666666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07634791449286472,
+        "ear_right": 0.12686394104834092,
+        "ear_mean": 0.10160592777060282,
+        "reason": "ok",
+        "observed_at": 3.6666666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.7083333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07634791449286472,
+        "ear_right": 0.12686394104834092,
+        "ear_mean": 0.10160592777060282,
+        "reason": "ok",
+        "observed_at": 3.6666666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.75,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07949216708686478,
+        "ear_right": 0.12809067222879086,
+        "ear_mean": 0.10379141965782782,
+        "reason": "ok",
+        "observed_at": 3.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.7916666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07949216708686478,
+        "ear_right": 0.12809067222879086,
+        "ear_mean": 0.10379141965782782,
+        "reason": "ok",
+        "observed_at": 3.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.8333333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08144915967588398,
+        "ear_right": 0.15210060529564182,
+        "ear_mean": 0.1167748824857629,
+        "reason": "ok",
+        "observed_at": 3.8333333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.875,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08144915967588398,
+        "ear_right": 0.15210060529564182,
+        "ear_mean": 0.1167748824857629,
+        "reason": "ok",
+        "observed_at": 3.8333333333333335
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.9166666666666665,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08470986106041956,
+        "ear_right": 0.13977387902267963,
+        "ear_mean": 0.11224187004154959,
+        "reason": "ok",
+        "observed_at": 3.9166666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 3.9583333333333335,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08470986106041956,
+        "ear_right": 0.13977387902267963,
+        "ear_mean": 0.11224187004154959,
+        "reason": "ok",
+        "observed_at": 3.9166666666666665
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.0,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08034991227921583,
+        "ear_right": 0.13774246712690044,
+        "ear_mean": 0.10904618970305813,
+        "reason": "ok",
+        "observed_at": 4.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.041666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08034991227921583,
+        "ear_right": 0.13774246712690044,
+        "ear_mean": 0.10904618970305813,
+        "reason": "ok",
+        "observed_at": 4.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.083333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07818815345751864,
+        "ear_right": 0.13079640356212546,
+        "ear_mean": 0.10449227850982205,
+        "reason": "ok",
+        "observed_at": 4.083333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.125,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07818815345751864,
+        "ear_right": 0.13079640356212546,
+        "ear_mean": 0.10449227850982205,
+        "reason": "ok",
+        "observed_at": 4.083333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.166666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07725765604619704,
+        "ear_right": 0.1227160347212804,
+        "ear_mean": 0.09998684538373873,
+        "reason": "ok",
+        "observed_at": 4.166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.208333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07725765604619704,
+        "ear_right": 0.1227160347212804,
+        "ear_mean": 0.09998684538373873,
+        "reason": "ok",
+        "observed_at": 4.166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.25,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07666024038566376,
+        "ear_right": 0.12681182994768178,
+        "ear_mean": 0.10173603516667276,
+        "reason": "ok",
+        "observed_at": 4.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.291666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07666024038566376,
+        "ear_right": 0.12681182994768178,
+        "ear_mean": 0.10173603516667276,
+        "reason": "ok",
+        "observed_at": 4.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.333333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07279860352585545,
+        "ear_right": 0.11467042278177839,
+        "ear_mean": 0.09373451315381692,
+        "reason": "ok",
+        "observed_at": 4.333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.375,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07279860352585545,
+        "ear_right": 0.11467042278177839,
+        "ear_mean": 0.09373451315381692,
+        "reason": "ok",
+        "observed_at": 4.333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.416666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0806375742313313,
+        "ear_right": 0.11701139981304638,
+        "ear_mean": 0.09882448702218885,
+        "reason": "ok",
+        "observed_at": 4.416666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.458333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0806375742313313,
+        "ear_right": 0.11701139981304638,
+        "ear_mean": 0.09882448702218885,
+        "reason": "ok",
+        "observed_at": 4.416666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.5,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09616022609494701,
+        "ear_right": 0.1639350808515274,
+        "ear_mean": 0.1300476534732372,
+        "reason": "ok",
+        "observed_at": 4.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.541666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09616022609494701,
+        "ear_right": 0.1639350808515274,
+        "ear_mean": 0.1300476534732372,
+        "reason": "ok",
+        "observed_at": 4.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.583333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12079591046667722,
+        "ear_right": 0.17622161531267272,
+        "ear_mean": 0.14850876288967496,
+        "reason": "ok",
+        "observed_at": 4.583333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.625,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12079591046667722,
+        "ear_right": 0.17622161531267272,
+        "ear_mean": 0.14850876288967496,
+        "reason": "ok",
+        "observed_at": 4.583333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.666666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11078655478560742,
+        "ear_right": 0.1533398478060699,
+        "ear_mean": 0.13206320129583865,
+        "reason": "ok",
+        "observed_at": 4.666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.708333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11078655478560742,
+        "ear_right": 0.1533398478060699,
+        "ear_mean": 0.13206320129583865,
+        "reason": "ok",
+        "observed_at": 4.666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.75,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0758513486886778,
+        "ear_right": 0.10601420043996322,
+        "ear_mean": 0.0909327745643205,
+        "reason": "ok",
+        "observed_at": 4.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.791666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0758513486886778,
+        "ear_right": 0.10601420043996322,
+        "ear_mean": 0.0909327745643205,
+        "reason": "ok",
+        "observed_at": 4.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.833333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.05626556952377441,
+        "ear_right": 0.09227593756378832,
+        "ear_mean": 0.07427075354378136,
+        "reason": "ok",
+        "observed_at": 4.833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.875,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.05626556952377441,
+        "ear_right": 0.09227593756378832,
+        "ear_mean": 0.07427075354378136,
+        "reason": "ok",
+        "observed_at": 4.833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.916666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0728626434083257,
+        "ear_right": 0.09000528222005164,
+        "ear_mean": 0.08143396281418866,
+        "reason": "ok",
+        "observed_at": 4.916666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 4.958333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0728626434083257,
+        "ear_right": 0.09000528222005164,
+        "ear_mean": 0.08143396281418866,
+        "reason": "ok",
+        "observed_at": 4.916666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.0,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.056962992290007064,
+        "ear_right": 0.08615263932943766,
+        "ear_mean": 0.07155781580972237,
+        "reason": "ok",
+        "observed_at": 5.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.041666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.056962992290007064,
+        "ear_right": 0.08615263932943766,
+        "ear_mean": 0.07155781580972237,
+        "reason": "ok",
+        "observed_at": 5.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.083333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0774829698599727,
+        "ear_right": 0.10900021265923196,
+        "ear_mean": 0.09324159125960232,
+        "reason": "ok",
+        "observed_at": 5.083333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.125,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.0774829698599727,
+        "ear_right": 0.10900021265923196,
+        "ear_mean": 0.09324159125960232,
+        "reason": "ok",
+        "observed_at": 5.083333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.166666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.04136219095065454,
+        "ear_right": 0.08556956634993568,
+        "ear_mean": 0.06346587865029511,
+        "reason": "ok",
+        "observed_at": 5.166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.208333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.04136219095065454,
+        "ear_right": 0.08556956634993568,
+        "ear_mean": 0.06346587865029511,
+        "reason": "ok",
+        "observed_at": 5.166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.25,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07010915343361891,
+        "ear_right": 0.09017160836174426,
+        "ear_mean": 0.08014038089768158,
+        "reason": "ok",
+        "observed_at": 5.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.291666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07010915343361891,
+        "ear_right": 0.09017160836174426,
+        "ear_mean": 0.08014038089768158,
+        "reason": "ok",
+        "observed_at": 5.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.333333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.13549220245304613,
+        "ear_right": 0.16554513594897957,
+        "ear_mean": 0.15051866920101287,
+        "reason": "ok",
+        "observed_at": 5.333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.375,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.13549220245304613,
+        "ear_right": 0.16554513594897957,
+        "ear_mean": 0.15051866920101287,
+        "reason": "ok",
+        "observed_at": 5.333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.416666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.1260922729281974,
+        "ear_right": 0.1299958025539872,
+        "ear_mean": 0.1280440377410923,
+        "reason": "ok",
+        "observed_at": 5.416666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.458333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.1260922729281974,
+        "ear_right": 0.1299958025539872,
+        "ear_mean": 0.1280440377410923,
+        "reason": "ok",
+        "observed_at": 5.416666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.5,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.1210964806929702,
+        "ear_right": 0.11720066140999982,
+        "ear_mean": 0.11914857105148502,
+        "reason": "ok",
+        "observed_at": 5.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.541666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.1210964806929702,
+        "ear_right": 0.11720066140999982,
+        "ear_mean": 0.11914857105148502,
+        "reason": "ok",
+        "observed_at": 5.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.583333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12248455887509711,
+        "ear_right": 0.12406868619073042,
+        "ear_mean": 0.12327662253291377,
+        "reason": "ok",
+        "observed_at": 5.583333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.625,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12248455887509711,
+        "ear_right": 0.12406868619073042,
+        "ear_mean": 0.12327662253291377,
+        "reason": "ok",
+        "observed_at": 5.583333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.666666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11469083791856037,
+        "ear_right": 0.11373383270920746,
+        "ear_mean": 0.11421233531388392,
+        "reason": "ok",
+        "observed_at": 5.666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.708333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11469083791856037,
+        "ear_right": 0.11373383270920746,
+        "ear_mean": 0.11421233531388392,
+        "reason": "ok",
+        "observed_at": 5.666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.75,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.13470776823533,
+        "ear_right": 0.12409456261589615,
+        "ear_mean": 0.12940116542561308,
+        "reason": "ok",
+        "observed_at": 5.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.791666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.13470776823533,
+        "ear_right": 0.12409456261589615,
+        "ear_mean": 0.12940116542561308,
+        "reason": "ok",
+        "observed_at": 5.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.833333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11688020261038641,
+        "ear_right": 0.12799266223939584,
+        "ear_mean": 0.12243643242489113,
+        "reason": "ok",
+        "observed_at": 5.833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.875,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11688020261038641,
+        "ear_right": 0.12799266223939584,
+        "ear_mean": 0.12243643242489113,
+        "reason": "ok",
+        "observed_at": 5.833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.916666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12090258089220914,
+        "ear_right": 0.10051040068968192,
+        "ear_mean": 0.11070649079094552,
+        "reason": "ok",
+        "observed_at": 5.916666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 5.958333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12090258089220914,
+        "ear_right": 0.10051040068968192,
+        "ear_mean": 0.11070649079094552,
+        "reason": "ok",
+        "observed_at": 5.916666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.0,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.041666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.083333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.083333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.125,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.083333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.166666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.208333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.25,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.3716729298694209,
+        "ear_right": 0.27973573477034025,
+        "ear_mean": 0.3257043323198806,
+        "reason": "ok",
+        "observed_at": 6.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.291666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.3716729298694209,
+        "ear_right": 0.27973573477034025,
+        "ear_mean": 0.3257043323198806,
+        "reason": "ok",
+        "observed_at": 6.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.333333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.3945211793037798,
+        "ear_right": 0.30514350395436934,
+        "ear_mean": 0.34983234162907456,
+        "reason": "ok",
+        "observed_at": 6.333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.375,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.3945211793037798,
+        "ear_right": 0.30514350395436934,
+        "ear_mean": 0.34983234162907456,
+        "reason": "ok",
+        "observed_at": 6.333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.416666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.3446831489547763,
+        "ear_right": 0.3229878075863517,
+        "ear_mean": 0.33383547827056403,
+        "reason": "ok",
+        "observed_at": 6.416666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.458333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.3446831489547763,
+        "ear_right": 0.3229878075863517,
+        "ear_mean": 0.33383547827056403,
+        "reason": "ok",
+        "observed_at": 6.416666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.5,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.38826776720695927,
+        "ear_right": 0.325976802312389,
+        "ear_mean": 0.3571222847596741,
+        "reason": "ok",
+        "observed_at": 6.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.541666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.38826776720695927,
+        "ear_right": 0.325976802312389,
+        "ear_mean": 0.3571222847596741,
+        "reason": "ok",
+        "observed_at": 6.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.583333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.3319376464535869,
+        "ear_right": 0.3113786530490676,
+        "ear_mean": 0.3216581497513272,
+        "reason": "ok",
+        "observed_at": 6.583333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.625,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.3319376464535869,
+        "ear_right": 0.3113786530490676,
+        "ear_mean": 0.3216581497513272,
+        "reason": "ok",
+        "observed_at": 6.583333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.666666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.708333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.75,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.791666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.833333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.875,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.916666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.916666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 6.958333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 6.916666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.0,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.041666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.083333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.083333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.125,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.083333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.166666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.208333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.166666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.25,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.291666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.333333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.375,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.333333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.416666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.416666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.458333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.416666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.5,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.541666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.583333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.583333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.625,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.583333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.666666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.708333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.666666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.75,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.791666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 7.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.833333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.4656553234535327,
+        "ear_right": 0.3014801550793019,
+        "ear_mean": 0.3835677392664173,
+        "reason": "ok",
+        "observed_at": 7.833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.875,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.4656553234535327,
+        "ear_right": 0.3014801550793019,
+        "ear_mean": 0.3835677392664173,
+        "reason": "ok",
+        "observed_at": 7.833333333333333
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.916666666666667,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.3180335943726128,
+        "ear_right": 0.2626253423599832,
+        "ear_mean": 0.290329468366298,
+        "reason": "ok",
+        "observed_at": 7.916666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 7.958333333333333,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.3180335943726128,
+        "ear_right": 0.2626253423599832,
+        "ear_mean": 0.290329468366298,
+        "reason": "ok",
+        "observed_at": 7.916666666666667
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": null,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": false
+      }
+    },
+    {
+      "time_seconds": 8.0,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 8.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.083554587591985,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.041666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": false,
+        "quality_ok": false,
+        "eyes_closed": null,
+        "ear_left": null,
+        "ear_right": null,
+        "ear_mean": null,
+        "reason": "face_not_found",
+        "observed_at": 8.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.083554587591985,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.083333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.16889527233307594,
+        "ear_right": 0.24063769564259424,
+        "ear_mean": 0.2047664839878351,
+        "reason": "ok",
+        "observed_at": 8.083333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.151085779591489,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.125,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": false,
+        "ear_left": 0.16889527233307594,
+        "ear_right": 0.24063769564259424,
+        "ear_mean": 0.2047664839878351,
+        "reason": "ok",
+        "observed_at": 8.083333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.151085779591489,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.166666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11672576149048002,
+        "ear_right": 0.205099766351956,
+        "ear_mean": 0.160912763921218,
+        "reason": "ok",
+        "observed_at": 8.166666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.646463705242891,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.208333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11672576149048002,
+        "ear_right": 0.205099766351956,
+        "ear_mean": 0.160912763921218,
+        "reason": "ok",
+        "observed_at": 8.166666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.646463705242891,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.25,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11302982536613665,
+        "ear_right": 0.22551209510547793,
+        "ear_mean": 0.1692709602358073,
+        "reason": "ok",
+        "observed_at": 8.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.559985609299253,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.291666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11302982536613665,
+        "ear_right": 0.22551209510547793,
+        "ear_mean": 0.1692709602358073,
+        "reason": "ok",
+        "observed_at": 8.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.559985609299253,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.333333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12185510415476249,
+        "ear_right": 0.22020588719990375,
+        "ear_mean": 0.1710304956773331,
+        "reason": "ok",
+        "observed_at": 8.333333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.657336970906812,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.375,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12185510415476249,
+        "ear_right": 0.22020588719990375,
+        "ear_mean": 0.1710304956773331,
+        "reason": "ok",
+        "observed_at": 8.333333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.657336970906812,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.416666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.1167272449635708,
+        "ear_right": 0.20680498830683278,
+        "ear_mean": 0.1617661166352018,
+        "reason": "ok",
+        "observed_at": 8.416666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.633345999318434,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.458333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.1167272449635708,
+        "ear_right": 0.20680498830683278,
+        "ear_mean": 0.1617661166352018,
+        "reason": "ok",
+        "observed_at": 8.416666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.633345999318434,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.5,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.1039406543378396,
+        "ear_right": 0.1919228450041491,
+        "ear_mean": 0.14793174967099434,
+        "reason": "ok",
+        "observed_at": 8.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.773949694099197,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.541666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.1039406543378396,
+        "ear_right": 0.1919228450041491,
+        "ear_mean": 0.14793174967099434,
+        "reason": "ok",
+        "observed_at": 8.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.773949694099197,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.583333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11532836622939432,
+        "ear_right": 0.19739223056661515,
+        "ear_mean": 0.15636029839800475,
+        "reason": "ok",
+        "observed_at": 8.583333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.661175060430871,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.625,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11532836622939432,
+        "ear_right": 0.19739223056661515,
+        "ear_mean": 0.15636029839800475,
+        "reason": "ok",
+        "observed_at": 8.583333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.661175060430871,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.666666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12586164749847653,
+        "ear_right": 0.22706272731723623,
+        "ear_mean": 0.17646218740785638,
+        "reason": "ok",
+        "observed_at": 8.666666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.467345181954662,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.708333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12586164749847653,
+        "ear_right": 0.22706272731723623,
+        "ear_mean": 0.17646218740785638,
+        "reason": "ok",
+        "observed_at": 8.666666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.467345181954662,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.75,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12062210870351714,
+        "ear_right": 0.20047792720280225,
+        "ear_mean": 0.1605500179531597,
+        "reason": "ok",
+        "observed_at": 8.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.1596841499259085,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.791666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.12062210870351714,
+        "ear_right": 0.20047792720280225,
+        "ear_mean": 0.1605500179531597,
+        "reason": "ok",
+        "observed_at": 8.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.1596841499259085,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.833333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09992604385040593,
+        "ear_right": 0.19885022404423197,
+        "ear_mean": 0.14938813394731895,
+        "reason": "ok",
+        "observed_at": 8.833333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.599822853988535,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.875,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09992604385040593,
+        "ear_right": 0.19885022404423197,
+        "ear_mean": 0.14938813394731895,
+        "reason": "ok",
+        "observed_at": 8.833333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.599822853988535,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.916666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10787875902909169,
+        "ear_right": 0.19094555477227335,
+        "ear_mean": 0.14941215690068252,
+        "reason": "ok",
+        "observed_at": 8.916666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.723819569327228,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 8.958333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10787875902909169,
+        "ear_right": 0.19094555477227335,
+        "ear_mean": 0.14941215690068252,
+        "reason": "ok",
+        "observed_at": 8.916666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.723819569327228,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.0,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10614574706771757,
+        "ear_right": 0.18565129813612624,
+        "ear_mean": 0.1458985226019219,
+        "reason": "ok",
+        "observed_at": 9.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.877905352644689,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.041666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10614574706771757,
+        "ear_right": 0.18565129813612624,
+        "ear_mean": 0.1458985226019219,
+        "reason": "ok",
+        "observed_at": 9.0
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.877905352644689,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.083333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11640720330974844,
+        "ear_right": 0.18744974086016084,
+        "ear_mean": 0.15192847208495464,
+        "reason": "ok",
+        "observed_at": 9.083333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.849753195664718,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.125,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11640720330974844,
+        "ear_right": 0.18744974086016084,
+        "ear_mean": 0.15192847208495464,
+        "reason": "ok",
+        "observed_at": 9.083333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.849753195664718,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.166666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.06563440935334722,
+        "ear_right": 0.15390826800358023,
+        "ear_mean": 0.10977133867846373,
+        "reason": "ok",
+        "observed_at": 9.166666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.177425796012286,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.208333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.06563440935334722,
+        "ear_right": 0.15390826800358023,
+        "ear_mean": 0.10977133867846373,
+        "reason": "ok",
+        "observed_at": 9.166666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.177425796012286,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.25,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10688664131602867,
+        "ear_right": 0.2003892115651437,
+        "ear_mean": 0.1536379264405862,
+        "reason": "ok",
+        "observed_at": 9.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.558238937157629,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.291666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10688664131602867,
+        "ear_right": 0.2003892115651437,
+        "ear_mean": 0.1536379264405862,
+        "reason": "ok",
+        "observed_at": 9.25
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.558238937157629,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.333333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11066379260337704,
+        "ear_right": 0.20028114614574197,
+        "ear_mean": 0.1554724693745595,
+        "reason": "ok",
+        "observed_at": 9.333333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.239931375936962,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.375,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11066379260337704,
+        "ear_right": 0.20028114614574197,
+        "ear_mean": 0.1554724693745595,
+        "reason": "ok",
+        "observed_at": 9.333333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.239931375936962,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.416666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09874522541293698,
+        "ear_right": 0.20708024795922397,
+        "ear_mean": 0.15291273668608046,
+        "reason": "ok",
+        "observed_at": 9.416666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.554507134074644,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.458333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09874522541293698,
+        "ear_right": 0.20708024795922397,
+        "ear_mean": 0.15291273668608046,
+        "reason": "ok",
+        "observed_at": 9.416666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.554507134074644,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.5,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07170551259442375,
+        "ear_right": 0.16127392022474704,
+        "ear_mean": 0.11648971640958539,
+        "reason": "ok",
+        "observed_at": 9.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.517277531912034,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.541666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.07170551259442375,
+        "ear_right": 0.16127392022474704,
+        "ear_mean": 0.11648971640958539,
+        "reason": "ok",
+        "observed_at": 9.5
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.517277531912034,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.583333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09340607940558149,
+        "ear_right": 0.17776450700378624,
+        "ear_mean": 0.13558529320468388,
+        "reason": "ok",
+        "observed_at": 9.583333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.8702496208042625,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.625,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09340607940558149,
+        "ear_right": 0.17776450700378624,
+        "ear_mean": 0.13558529320468388,
+        "reason": "ok",
+        "observed_at": 9.583333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.8702496208042625,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.666666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09684103358164652,
+        "ear_right": 0.18946077167477218,
+        "ear_mean": 0.14315090262820934,
+        "reason": "ok",
+        "observed_at": 9.666666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.803206416067785,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.708333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.09684103358164652,
+        "ear_right": 0.18946077167477218,
+        "ear_mean": 0.14315090262820934,
+        "reason": "ok",
+        "observed_at": 9.666666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.803206416067785,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.75,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08934828298064319,
+        "ear_right": 0.19407828592758547,
+        "ear_mean": 0.14171328445411432,
+        "reason": "ok",
+        "observed_at": 9.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.958463650501649,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.791666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.08934828298064319,
+        "ear_right": 0.19407828592758547,
+        "ear_mean": 0.14171328445411432,
+        "reason": "ok",
+        "observed_at": 9.75
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.958463650501649,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.833333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10321769455260506,
+        "ear_right": 0.2095671104047086,
+        "ear_mean": 0.15639240247865682,
+        "reason": "ok",
+        "observed_at": 9.833333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.546094508620007,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.875,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.10321769455260506,
+        "ear_right": 0.2095671104047086,
+        "ear_mean": 0.15639240247865682,
+        "reason": "ok",
+        "observed_at": 9.833333333333334
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 7.546094508620007,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.916666666666666,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11916526557096495,
+        "ear_right": 0.2153078773611509,
+        "ear_mean": 0.16723657146605792,
+        "reason": "ok",
+        "observed_at": 9.916666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 6.942834122965216,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    },
+    {
+      "time_seconds": 9.958333333333334,
+      "guard_track_id": 0,
+      "eyes": {
+        "available": true,
+        "quality_ok": true,
+        "eyes_closed": true,
+        "ear_left": 0.11916526557096495,
+        "ear_right": 0.2153078773611509,
+        "ear_mean": 0.16723657146605792,
+        "reason": "ok",
+        "observed_at": 9.916666666666666
+      },
+      "phone": {
+        "detected": false,
+        "usage": "no_phone",
+        "bbox": null,
+        "confidence": null,
+        "nearest_hand_ratio": null,
+        "nearest_head_ratio": null
+      },
+      "posture": {
+        "posture": "unknown",
+        "head_down": false,
+        "torso_lean_deg": 6.942834122965216,
+        "left_knee_angle_deg": null,
+        "right_knee_angle_deg": null,
+        "head_down_known": true
+      }
+    }
+  ]
+}

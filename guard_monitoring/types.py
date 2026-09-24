@@ -31,6 +31,7 @@ class PostureState:
     torso_lean_deg: Optional[float] = None
     left_knee_angle_deg: Optional[float] = None
     right_knee_angle_deg: Optional[float] = None
+    head_down_known: bool = False
 
 
 @dataclass
@@ -42,6 +43,8 @@ class EyeState:
     ear_right: Optional[float] = None
     ear_mean: Optional[float] = None
     reason: str = "not_run"
+    observed_at: Optional[float] = None
+    head_roll_degrees: Optional[float] = None
 
 
 @dataclass
@@ -61,6 +64,10 @@ class MovementState:
     radius_ratio: Optional[float] = None
     visited_patrol_zones: tuple[str, ...] = ()
     patrol_coverage_ratio: Optional[float] = None
+    reliable: bool = False
+    reason: str = "insufficient_history"
+    motion_source: str = "unknown"
+    anchor_visible: bool = False
 
 
 @dataclass
@@ -72,6 +79,11 @@ class SleepState:
     reason: str = "insufficient_evidence"
     evidence_quality: str = "unknown"  # high | degraded | unknown
     missing_modules: tuple[str, ...] = ()
+    eye_evidence_seconds: float = 0.0
+    fallback_seconds: float = 0.0
+    eye_coverage: float = 0.0
+    continuous_closed_seconds: float = 0.0
+    decision_basis: str = "unknown"
 
 
 @dataclass

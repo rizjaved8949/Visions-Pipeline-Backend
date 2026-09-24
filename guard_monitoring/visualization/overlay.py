@@ -11,6 +11,62 @@ COCO_EDGES = [
 ]
 
 
+def draw_activity_status(frame, label, *, bbox=None):
+    """Draw confirmed activity inside the selected box when one is supplied.
+
+    Draw on a sliced view so every text/background pixel stays within the box.
+    The no-box form is kept for existing direct callers; the pipeline always
+    supplies its selected guard box. This function never infers an activity.
+    """
+    from ..monitoring.activity import ACTIVITY_LABELS
+
+    if label not in ACTIVITY_LABELS:
+        return
+    if bbox is not None:
+        if len(bbox) != 4 or not np.isfinite(bbox).all():
+            return
+        frame_height, frame_width = frame.shape[:2]
+        x1, y1, x2, y2 = bbox
+        # Stay inside both the rectangle outline and the image edges. Check the
+        # intersection before slicing so wholly off-screen boxes remain empty.
+        left = max(0, int(np.ceil(x1)) + 3)
+        top = max(0, int(np.ceil(y1)) + 3)
+        right = min(frame_width, int(np.floor(x2)) - 3)
+        bottom = min(frame_height, int(np.floor(y2)) - 3)
+        if right <= left or bottom <= top:
+            return
+        frame = frame[top:bottom, left:right]
+    height, width = frame.shape[:2]
+    if height < 20 or width < 40:
+        return
+    text = f"GUARD STATUS: {label}"
+    padding = max(3, min(14, width // 70))
+    scale = max(0.35, min(1.0, height / 900.0))
+    thickness = max(1, round(scale * 2))
+    (tw, th), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, scale, thickness)
+    if tw > width - padding * 4:
+        scale *= (width - padding * 4) / max(tw, 1)
+        thickness = 1
+        (tw, th), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, scale, thickness)
+    x = padding
+    # Keep the activity label at the top-left inside the selected guard box.
+    # Identity drawing remains separate; this function only renders activity.
+    banner_height = th + baseline + padding * 2
+    y = padding if bbox is not None else padding
+    right = min(width - 1, x + tw + padding * 2)
+    bottom = min(height - 1, y + th + baseline + padding * 2)
+    # Blend only the banner region, avoiding a second full-frame copy.
+    region = frame[y:bottom, x:right]
+    if not region.size:
+        return
+    dark = np.zeros_like(region)
+    cv2.addWeighted(region, 0.22, dark, 0.78, 0, region)
+    color = {"Sleeping": (110, 160, 255), "Using Mobile": (70, 215, 255),
+             "Moving": (150, 245, 170), "Stationary": (245, 245, 245)}[label]
+    cv2.putText(frame, text, (x + padding, y + padding + th),
+                cv2.FONT_HERSHEY_SIMPLEX, scale, color, thickness, cv2.LINE_AA)
+
+
 def draw_polygon(frame, polygon, label=None):
     pts = np.asarray(polygon, dtype=np.int32).reshape((-1, 1, 2))
     cv2.polylines(frame, [pts], True, (0, 220, 255), 2)
@@ -57,3 +113,31 @@ def draw_status_panel(frame, lines, alerts):
             y += line_h
     else:
         cv2.putText(frame, "ALERT: none", (x0, y), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (180, 180, 180), 1, cv2.LINE_AA)
+
+
+def draw_guard_identity(frame, guard, *, show_box=True, show_id=True):
+    """Selected identity only; retained observations are explicitly marked."""
+    if guard is None or frame.size == 0:
+        return
+    h, w = frame.shape[:2]
+    if not np.isfinite(guard.bbox).all() or h < 20 or w < 40:
+        return
+    x1, y1, x2, y2 = [int(round(v)) for v in guard.bbox]
+    x1, x2 = np.clip([x1, x2], 0, w-1)
+    y1, y2 = np.clip([y1, y2], 0, h-1)
+    if x2 <= x1 or y2 <= y1:
+        return
+    color = (80, 230, 110) if guard.seen_now else (0, 190, 255)
+    if show_box:
+        cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
+    if show_id:
+        text = f"GUARD ID: {guard.track_id}" + ("" if guard.seen_now else " (last seen)")
+        scale = max(.35, min(.7, h/1000.0))
+        (tw, th), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, scale, 1)
+        if tw > w-8:
+            scale *= (w-8)/max(tw, 1)
+            (tw, th), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, scale, 1)
+        tx = max(2, min(int(x1), w-tw-3))
+        ty = min(h-baseline-3, max(int(y1)-6, min(h//2, 60)+th))
+        cv2.rectangle(frame, (tx-2, ty-th-3), (min(w-1, tx+tw+2), min(h-1, ty+baseline+2)), (20, 20, 20), -1)
+        cv2.putText(frame, text, (tx, ty), cv2.FONT_HERSHEY_SIMPLEX, scale, color, 1, cv2.LINE_AA)

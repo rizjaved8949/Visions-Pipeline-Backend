@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import atexit
 import os
+import math
 import threading
 import time
 import uuid
@@ -51,7 +52,7 @@ def _validate_rule_settings(settings: dict[str, float] | None) -> dict[str, floa
         if name not in _RULE_NAMES:
             raise ValueError(f"Unsupported live rule setting: {name}")
         number = float(value)
-        if number < 0:
+        if not math.isfinite(number) or number < 0:
             raise ValueError(f"{name}_seconds must be >= 0")
         result[name] = number
     return result
@@ -91,12 +92,14 @@ class _LiveSession:
     thread: threading.Thread | None = field(default=None, repr=False)
     started_monotonic: float | None = field(default=None, repr=False)
     rules: Any = field(default=None, repr=False)
+    ended_monotonic: float | None = field(default=None, repr=False)
 
     def public(self) -> dict[str, Any]:
         with self.lock:
             uptime = 0.0
             if self.started_monotonic is not None:
-                uptime = max(0.0, time.monotonic() - self.started_monotonic)
+                uptime = max(0.0, (self.ended_monotonic if self.ended_monotonic is not None
+                                   else time.monotonic()) - self.started_monotonic)
             return {
                 "session_id": self.session_id,
                 "camera_id": self.camera_id,
@@ -166,7 +169,7 @@ class GuardLiveService:
             if reconnect_seconds is not None
             else _env_float("GUARD_LIVE_RECONNECT_SECONDS", 2.0)
         )
-        if reconnect < 0.1:
+        if not math.isfinite(reconnect) or reconnect < 0.1:
             raise ValueError("reconnect_seconds must be >= 0.1")
 
         requested_settings = _validate_rule_settings(rule_settings)
@@ -257,9 +260,7 @@ class GuardLiveService:
         updates = _validate_rule_settings(settings)
         with session.lock:
             session.settings.update(updates)
-            if session.rules is not None:
-                for name, value in updates.items():
-                    session.rules.thresholds[name] = float(value)
+            # The inference worker applies a complete settings snapshot between frames.
         return session.public()
 
     def stop(self, session_id: str, *, join_timeout: float = 5.0) -> dict[str, Any] | None:
@@ -308,12 +309,26 @@ class GuardLiveService:
             time.sleep(0.05)
 
     def _run(self, session: _LiveSession) -> None:
+        # Include lazy imports/configuration in failure handling: missing packages
+        # must produce a failed session rather than an eternal "starting" state.
+        try:
+            self._run_impl(session)
+        except Exception as exc:
+            with session.lock:
+                session.status = "failed"
+                session.error = f"{type(exc).__name__}: {exc}"
+        finally:
+            with session.lock:
+                session.ended_monotonic = time.monotonic()
+
+    def _run_impl(self, session: _LiveSession) -> None:
         # Heavy imports intentionally live here to keep FastAPI import lightweight.
         import cv2
 
         from .geometry import normalized_polygon_to_pixels
         from .io import open_capture, video_metadata
         from .monitoring.guard_selector import GuardSelector
+        from .diagnostics import effective_config, runtime_info
         from .monitoring.movement import MovementMonitor
         from .monitoring.rules import TimedRuleEngine
         from .pipeline import GuardMonitoringPipeline
@@ -325,7 +340,14 @@ class GuardLiveService:
         for name, value in session.settings.items():
             cfg["rules"][f"{name}_seconds"] = float(value)
 
+        sampling_gap = max(cfg["rules"]["max_evidence_gap_seconds"], 1.5 / session.analysis_fps)
+        cfg["rules"]["max_evidence_gap_seconds"] = sampling_gap
+        cfg["movement"]["max_gap_seconds"] = sampling_gap
+        cfg["camera_motion"]["max_gap_seconds"] = sampling_gap
+        cfg["activity"]["max_evidence_gap_seconds"] = sampling_gap
+        cfg["sleep_logic"]["max_gap_seconds"] = sampling_gap
         pipeline = GuardMonitoringPipeline(cfg)
+        runtime_metadata = None
         frame_idx = 0
         next_due = 0.0
         runtime = None
@@ -377,6 +399,8 @@ class GuardLiveService:
                     with session.lock:
                         session.status = "reconnecting"
                         session.error = "Camera read failed; reconnecting"
+                        session.latest_state = None
+                        session.latest_jpeg = None
                         session.reconnect_count += 1
                     session.stop_event.wait(session.reconnect_seconds)
                     continue
@@ -390,6 +414,9 @@ class GuardLiveService:
                     continue
 
                 try:
+                    with session.lock:
+                        settings = dict(session.settings)
+                    runtime["rules"].thresholds.update(settings)
                     result = pipeline._process_frame(
                         frame=frame,
                         frame_idx=frame_idx,
@@ -401,6 +428,12 @@ class GuardLiveService:
                         patrol_zones=runtime["patrol_zones"],
                     )
                     state = deepcopy(result["frame_log"])
+                    if runtime_metadata is None and result["guard_seen_now"]:
+                        runtime_metadata = runtime_info(pipeline.registry)
+                    state["runtime"] = runtime_metadata
+                    state["effective_config"] = effective_config(cfg)
+                    for rule_name, threshold in runtime["rules"].thresholds.items():
+                        state["effective_config"]["rules"][f"{rule_name}_seconds"] = threshold
                     state.update(
                         {
                             "session_id": session.session_id,
@@ -413,12 +446,19 @@ class GuardLiveService:
                             },
                         }
                     )
-                    ok_encode, encoded = cv2.imencode(
-                        ".jpg",
-                        result["annotated"],
-                        [int(cv2.IMWRITE_JPEG_QUALITY), session.jpeg_quality],
-                    )
-                    jpeg = encoded.tobytes() if ok_encode else None
+                    # Preview encoding must not discard events whose one-shot
+                    # latches were already set by the independent rule engine.
+                    try:
+                        ok_encode, encoded = cv2.imencode(
+                            ".jpg",
+                            result["annotated"],
+                            [int(cv2.IMWRITE_JPEG_QUALITY), session.jpeg_quality],
+                        )
+                        jpeg = encoded.tobytes() if ok_encode else None
+                    except Exception as exc:
+                        from .contracts import error_result
+                        pipeline.health.record("preview_encoding", error_result(exc))
+                        jpeg = None
 
                     fl = result["frame_log"]
                     mv = fl.get("movement") or {}
@@ -443,8 +483,8 @@ class GuardLiveService:
                             session.stats["phone_use_frames"] += 1
                         if fl.get("present") is False:
                             session.stats["absence_frames"] += 1
+                        session.latest_jpeg = jpeg
                         if jpeg is not None:
-                            session.latest_jpeg = jpeg
                             session.frame_version += 1
                         for event in result["events"]:
                             enriched = deepcopy(event)
@@ -453,6 +493,10 @@ class GuardLiveService:
                             session.events.append(enriched)
                     frame_idx += 1
                 except Exception as exc:
+                    # A failed frame contributes no activity duration.
+                    runtime["rules"].pause_all(elapsed)
+                    pipeline.sleep_analyzer.pause(elapsed)
+                    pipeline.activity.update(None, elapsed, present=None)
                     # A single orchestration failure must not permanently kill the camera loop.
                     with session.lock:
                         session.error = f"FramePipelineError: {type(exc).__name__}: {exc}"
@@ -463,6 +507,7 @@ class GuardLiveService:
                 session.status = "failed"
                 session.error = f"{type(exc).__name__}: {exc}"
         finally:
+            pipeline.close()
             if cap is not None:
                 cap.release()
             with session.lock:
@@ -481,6 +526,7 @@ class GuardLiveService:
         TimedRuleEngine,
         normalized_polygon_to_pixels,
     ) -> dict[str, Any]:
+        pipeline.reset_stream()
         duty_zone = normalized_polygon_to_pixels(
             cfg["guard_selection"]["duty_zone"], width, height
         )
@@ -495,6 +541,7 @@ class GuardLiveService:
             release_seconds=sel_cfg.get("release_seconds", 5.0),
             presence_grace_seconds=sel_cfg.get("presence_grace_seconds", 2.0),
             manual_track_id=sel_cfg.get("manual_track_id"),
+            candidate_gap_seconds=max(sel_cfg.get("candidate_gap_seconds", 0.5), 1.5 / analysis_fps),
         )
         move_cfg = cfg["movement"]
         movement_monitor = MovementMonitor(
@@ -502,6 +549,11 @@ class GuardLiveService:
             stationary_radius_ratio=move_cfg.get("stationary_radius_ratio", 0.035),
             minimum_history_seconds=move_cfg.get("minimum_history_seconds", 2.0),
             patrol_zones=patrol_zones,
+            smoothing_seconds=move_cfg.get("smoothing_seconds", 0.25),
+            radius_quantile=move_cfg.get("radius_quantile", 0.90),
+            max_gap_seconds=move_cfg.get("max_gap_seconds", 2.0),
+            border_margin_ratio=move_cfg.get("border_margin_ratio", 0.015),
+            max_box_scale_change=move_cfg.get("max_box_scale_change", 0.25),
         )
         rules = TimedRuleEngine(pipeline.camera_id, cfg["rules"])
         pipeline.video_fps = analysis_fps

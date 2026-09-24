@@ -1,21 +1,35 @@
 from __future__ import annotations
 
 import threading
+import time
 from collections.abc import Callable
 from typing import Any
 
 from .contracts import ModuleResult, disabled, error_result, ok
 from .health import ModuleHealthRegistry
 
-# Heavy, stateless models (detector/pose/phone/eyes) are expensive to load
-# (multi-second GPU/model-graph setup) but safe to share across every job and
-# live session, since inference calls don't carry any per-session memory.
+# Detector/pose/phone model weights are expensive to load and are shared
+# across jobs. Load and prediction locks protect mutable adapter/model state.
+# Stateful MediaPipe eyes and trackers remain private to each job/session.
 # Without this, every single uploaded video or "Connect camera" click paid the
 # full load cost again - the dominant part of "why does this take so long".
 # The tracker is deliberately excluded: it holds per-session track history and
 # must never be shared between unrelated videos/sessions.
 _GLOBAL_MODEL_CACHE: dict[tuple[str, tuple[Any, ...]], object] = {}
 _GLOBAL_CACHE_LOCK = threading.Lock()
+_GLOBAL_LOAD_LOCKS: dict[tuple, threading.Lock] = {}
+
+
+class _SynchronizedPredictor:
+    """Shared model inference and its postprocessing run under one lock."""
+
+    def __init__(self, model):
+        self.model = model
+        self.lock = threading.Lock()
+
+    def predict(self, *args, **kwargs):
+        with self.lock:
+            return self.model.predict(*args, **kwargs)
 
 
 class LazyModelRegistry:
@@ -70,22 +84,31 @@ class LazyModelRegistry:
                 self._record(f"{name}_load", result)
                 return result
 
+        started = time.perf_counter()
         try:
-            instance = builder()
-            self._instances[name] = instance
             if global_key is not None:
                 with _GLOBAL_CACHE_LOCK:
-                    _GLOBAL_MODEL_CACHE[global_key] = instance
+                    load_lock = _GLOBAL_LOAD_LOCKS.setdefault(global_key, threading.Lock())
+                with load_lock:
+                    with _GLOBAL_CACHE_LOCK:
+                        instance = _GLOBAL_MODEL_CACHE.get(global_key)
+                    if instance is None:
+                        instance = _SynchronizedPredictor(builder())
+                        with _GLOBAL_CACHE_LOCK:
+                            _GLOBAL_MODEL_CACHE[global_key] = instance
+            else:
+                instance = builder()
+            self._instances[name] = instance
             result = ok(instance, detail="loaded")
         except Exception as exc:
             self._load_errors[name] = exc
             result = error_result(exc, detail=f"model_load_failed: {exc}")
-        self._record(f"{name}_load", result)
+        self._record(f"{name}_load", result, (time.perf_counter() - started) * 1000.0)
         return result
 
-    def _record(self, name: str, result: ModuleResult) -> None:
+    def _record(self, name: str, result: ModuleResult, elapsed_ms=None) -> None:
         if self.health is not None:
-            self.health.record(name, result)
+            self.health.record(name, result, elapsed_ms)
 
     def guard_detector(self) -> ModuleResult:
         cfg = self.cfg["models"]["guard_detector"]
@@ -191,7 +214,39 @@ class LazyModelRegistry:
 
         return self._get("eyes", build, enabled)
 
+    def device_summary(self):
+        devices = {}
+        for name, instance in self._instances.items():
+            device = None
+            try:
+                for _ in range(5):
+                    device = getattr(instance, "device", None)
+                    if device is not None:
+                        break
+                    parameters = getattr(instance, "parameters", None)
+                    if callable(parameters):
+                        parameter = next(iter(parameters()), None)
+                        device = getattr(parameter, "device", None)
+                        if device is not None:
+                            break
+                    nested = getattr(instance, "model", None)
+                    if nested is None or nested is instance:
+                        break
+                    instance = nested
+            except Exception:
+                device = None
+            devices[name] = str(device) if device is not None else "not_reported"
+        return devices
+
     def reset_tracker(self) -> None:
         tracker = self._instances.get("tracker")
         if tracker is not None and hasattr(tracker, "reset"):
             tracker.reset()
+
+    def close(self) -> None:
+        # Eye landmarkers are per-stream temporal resources. Never close shared
+        # detector/YOLO models still in use by another job or camera.
+        eyes = self._instances.pop("eyes", None)
+        self._load_errors.pop("eyes", None)
+        if eyes is not None and hasattr(eyes, "close"):
+            eyes.close()

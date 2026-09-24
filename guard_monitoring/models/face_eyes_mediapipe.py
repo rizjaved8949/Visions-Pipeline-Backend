@@ -113,6 +113,8 @@ class MediaPipeEyeAnalyzer:
         ear_left = self._ear(left)
         ear_right = self._ear(right)
         ear_mean = (ear_left + ear_right) / 2.0
+        delta = right.mean(axis=0) - left.mean(axis=0)
+        head_roll = (float(np.degrees(np.arctan2(delta[1], delta[0]))) + 90.0) % 180.0 - 90.0
         return EyeState(
             available=True,
             quality_ok=True,
@@ -121,6 +123,7 @@ class MediaPipeEyeAnalyzer:
             ear_right=ear_right,
             ear_mean=ear_mean,
             reason="ok",
+            head_roll_degrees=head_roll,
         )
 
     def _landmarks(self, rgb, timestamp_ms: int):
