@@ -103,7 +103,7 @@ def load_config(
                 "weights": _env("GUARD_POSE_WEIGHTS", "guard_monitoring/weights/yolo26m-pose.pt"),
                 "confidence": _float("GUARD_POSE_CONFIDENCE", 0.20),
                 "imgsz": _int("GUARD_POSE_IMAGE_SIZE", 640),
-                "every_n_frames": _int("GUARD_POSE_EVERY_N_FRAMES", 2),
+                "every_n_frames": _int("GUARD_POSE_EVERY_N_FRAMES", 1),
                 "cache_max_frames": _int("GUARD_POSE_CACHE_FRAMES", 3),
                 "cache_max_seconds": _float("GUARD_POSE_CACHE_SECONDS", 0.75),
             },
@@ -111,7 +111,7 @@ def load_config(
                 "weights": _env("GUARD_PHONE_WEIGHTS", "guard_monitoring/weights/yolo26m.pt"),
                 "confidence": _float("GUARD_PHONE_CONFIDENCE", 0.20),
                 "imgsz": _int("GUARD_PHONE_IMAGE_SIZE", 640),
-                "every_n_frames": _int("GUARD_PHONE_EVERY_N_FRAMES", 2),
+                "every_n_frames": _int("GUARD_PHONE_EVERY_N_FRAMES", 1),
                 "cache_max_frames": _int("GUARD_PHONE_CACHE_FRAMES", 3),
                 "cache_max_seconds": _float("GUARD_PHONE_CACHE_SECONDS", 0.75),
                 "target_labels": target_labels,
@@ -119,7 +119,7 @@ def load_config(
             "eyes": {
                 "enabled": _bool("GUARD_EYES_ENABLED", True),
                 "face_landmarker_model": _env("GUARD_FACE_LANDMARKER_MODEL", ""),
-                "every_n_frames": _int("GUARD_EYES_EVERY_N_FRAMES", 2),
+                "every_n_frames": _int("GUARD_EYES_EVERY_N_FRAMES", 1),
                 "cache_max_frames": _int("GUARD_EYES_CACHE_FRAMES", 3),
                 "cache_max_seconds": _float("GUARD_EYES_CACHE_SECONDS", 0.75),
                 "min_face_pixels": _int("GUARD_MIN_FACE_PIXELS", 48),
@@ -287,7 +287,7 @@ def load_config(
             # Activity is never guessed for these boxes (they are not
             # analyzed for phone/pose/sleep). Off by default keeps the
             # existing regression tests unchanged.
-            "draw_all_persons": _bool("GUARD_DRAW_ALL_PERSONS", True),
+            "draw_all_persons": _bool("GUARD_DRAW_ALL_PERSONS", False),
             # Additive: bottom-left status HUD summarizing present/activity/
             # phone/sleep/movement. Useful when the guard box is briefly off
             # frame; off by default to keep tests deterministic.
