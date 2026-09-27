@@ -115,6 +115,97 @@ def draw_status_panel(frame, lines, alerts):
         cv2.putText(frame, "ALERT: none", (x0, y), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (180, 180, 180), 1, cv2.LINE_AA)
 
 
+def draw_all_persons(frame, tracked_detections, selected_id=None):
+    """Draw a thin grey box + 'person #N' label for every tracked person
+    that is NOT the currently selected guard.
+
+    Parameters
+    ----------
+    tracked_detections
+        The supervision.Detections-like namespace returned by ByteTrack
+        (has .tracker_id and .xyxy attributes). May be None; function is
+        a no-op in that case.
+    selected_id
+        The track_id of the currently selected guard. Persons with this
+        id are skipped (they get the full selected-guard overlay instead).
+    """
+    if tracked_detections is None:
+        return
+    ids = getattr(tracked_detections, "tracker_id", None)
+    boxes = getattr(tracked_detections, "xyxy", None)
+    if ids is None or boxes is None or len(ids) == 0:
+        return
+    h, w = frame.shape[:2]
+    for idx, tid in enumerate(ids):
+        if tid is None:
+            continue
+        if selected_id is not None and int(tid) == int(selected_id):
+            continue
+        try:
+            x1, y1, x2, y2 = [int(round(float(v))) for v in boxes[idx]]
+        except Exception:
+            continue
+        x1, x2 = max(0, x1), min(w - 1, x2)
+        y1, y2 = max(0, y1), min(h - 1, y2)
+        if x2 <= x1 or y2 <= y1:
+            continue
+        # Thin grey box, low alpha to stay unobtrusive.
+        color = (140, 140, 140)
+        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 1)
+        label = f"person #{tid}"
+        scale = max(0.30, min(0.50, h / 1200.0))
+        try:
+            (tw, th), baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, scale, 1)
+            tw, th, baseline = int(tw), int(th), int(baseline)
+        except (TypeError, ValueError):
+            tw, th, baseline = 60, 12, 2
+        tx = max(2, min(x1, w - tw - 4))
+        ty = max(th + 4, y1 - 4)
+        cv2.rectangle(frame, (tx - 1, ty - th - 2), (min(w - 1, tx + tw + 1), min(h - 1, ty + baseline + 1)),
+                      (30, 30, 30), -1)
+        cv2.putText(frame, label, (tx, ty), cv2.FONT_HERSHEY_SIMPLEX, scale, color, 1, cv2.LINE_AA)
+
+
+def draw_hud(frame, *, present, activity, phone, sleep, movement):
+    """Bottom-left status HUD: a compact one-line-per-module status block.
+
+    Intended for operators who need to verify the system is working
+    even when the guard box is off-frame. Off by default.
+    """
+    lines = []
+    presence_text = {True: "PRESENT", False: "ABSENT", None: "UNKNOWN"}.get(present, "UNKNOWN")
+    lines.append(f"presence: {presence_text}")
+    lines.append(f"activity: {activity or 'none'}")
+    phone_text = "YES" if (phone is not None and getattr(phone, "detected", False)) else "no"
+    lines.append(f"phone:    {phone_text}")
+    sleep_cand = getattr(sleep, "candidate", False)
+    lines.append(f"sleep:    {'candidate' if sleep_cand else 'no'}")
+    if movement is not None:
+        mv_reliable = getattr(movement, "reliable", False)
+        mv_stat = getattr(movement, "stationary", None)
+        mv_text = ("stationary" if mv_stat else "moving") if mv_reliable else "unknown"
+        lines.append(f"movement: {mv_text}")
+
+    h, w = frame.shape[:2]
+    line_h = 18
+    padding = 6
+    panel_h = line_h * len(lines) + padding * 2
+    panel_w = 190
+    bx1, by1 = 8, h - panel_h - 8
+    bx2, by2 = bx1 + panel_w, by1 + panel_h
+    if by1 < 0:
+        return
+    # Semi-transparent background
+    region = frame[by1:by2, bx1:bx2]
+    if region.size:
+        dark = np.zeros_like(region)
+        cv2.addWeighted(region, 0.25, dark, 0.75, 0, region)
+    for i, line in enumerate(lines):
+        ty = by1 + padding + line_h * i + line_h - 4
+        cv2.putText(frame, line, (bx1 + 5, ty),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.38, (220, 220, 220), 1, cv2.LINE_AA)
+
+
 def draw_guard_identity(frame, guard, *, show_box=True, show_id=True):
     """Selected identity only; retained observations are explicitly marked."""
     if guard is None or frame.size == 0:

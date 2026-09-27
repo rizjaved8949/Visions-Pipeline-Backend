@@ -15,6 +15,10 @@ class GuardTrack:
     bbox: BBox
     confidence: float
     seen_now: bool = True
+    # Additive metadata for improved tracking. Never used by the rule engine;
+    # visualization/diagnostics only. Defaults preserve pre-existing constructors.
+    source: str = "detected"  # detected | retained | predicted | reid_adopted
+    predicted_bbox: Optional[BBox] = None  # motion-model guess, only when source != "detected"
 
 
 @dataclass
@@ -32,6 +36,12 @@ class PostureState:
     left_knee_angle_deg: Optional[float] = None
     right_knee_angle_deg: Optional[float] = None
     head_down_known: bool = False
+    # Additive: how the posture was decided. Consumers that don't know these
+    # fields simply ignore them; the sleep rule engine only looks at the
+    # existing posture/head_down/torso_lean_deg fields, so its behavior is
+    # unchanged.
+    posture_source: str = "keypoints"  # keypoints | bbox_shape | occlusion_inferred | unknown
+    bbox_aspect_ratio: Optional[float] = None  # height / width
 
 
 @dataclass
@@ -55,6 +65,9 @@ class PhoneState:
     confidence: Optional[float] = None
     nearest_hand_ratio: Optional[float] = None
     nearest_head_ratio: Optional[float] = None
+    # Additive: which crop the accepted phone came from ("guard_box" |
+    # "wrist_left" | "wrist_right"). Purely diagnostic.
+    detection_source: str = "guard_box"
 
 
 @dataclass

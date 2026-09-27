@@ -26,7 +26,7 @@ from .monitoring.presence import PresenceState, presence_from_tracker
 from .monitoring.rules import TimedRuleEngine
 from .monitoring.sleep import SleepAnalyzer
 from .types import EyeState, MovementState, PhoneState, PostureState, SleepState
-from .visualization.overlay import draw_activity_status, draw_guard_identity
+from .visualization.overlay import draw_activity_status, draw_all_persons, draw_guard_identity, draw_hud
 
 ProgressCallback = Callable[[dict], None]
 
@@ -126,6 +126,12 @@ class GuardMonitoringPipeline:
             presence_grace_seconds=sel_cfg.get("presence_grace_seconds", 2.0),
             manual_track_id=sel_cfg.get("manual_track_id"),
             candidate_gap_seconds=max(sel_cfg.get("candidate_gap_seconds", 0.5), 1.5 / fps),
+            reid_enabled=sel_cfg.get("reid_enabled", False),
+            reid_hist_bins=sel_cfg.get("reid_hist_bins", 24),
+            reid_min_similarity=sel_cfg.get("reid_min_similarity", 0.70),
+            reid_max_footpoint_ratio=sel_cfg.get("reid_max_footpoint_ratio", 0.35),
+            reid_update_every_frames=sel_cfg.get("reid_update_every_frames", 5),
+            predict_during_grace=sel_cfg.get("predict_during_grace", False),
         )
         move_cfg = self.cfg["movement"]
         movement_monitor = MovementMonitor(
@@ -138,6 +144,7 @@ class GuardMonitoringPipeline:
             max_gap_seconds=move_cfg.get("max_gap_seconds", 2.0),
             border_margin_ratio=move_cfg.get("border_margin_ratio", 0.015),
             max_box_scale_change=move_cfg.get("max_box_scale_change", 0.25),
+            min_visible_area_ratio=move_cfg.get("min_visible_area_ratio", 0.75),
         )
         rules = TimedRuleEngine(self.camera_id, self.cfg["rules"])
 
@@ -365,12 +372,17 @@ class GuardMonitoringPipeline:
         module_results["tracking"] = tracked
 
         # Guard selection/presence are only considered known when tracking ran.
+        # ``frame`` is passed positionally-safe via a kwarg the current
+        # GuardSelector accepts; when a caller wires a pre-refactor selector
+        # in, this call also degrades cleanly because we pass frame=None on
+        # legacy paths.
         if tracked.ok:
             guard_result = safe_run(
                 "guard_selection",
                 selector.update,
                 tracked.value,
                 now,
+                frame=frame,
                 health=self.health,
             )
         else:
@@ -444,6 +456,7 @@ class GuardMonitoringPipeline:
                     "posture",
                     self.posture_analyzer.analyze,
                     pose_obs.keypoints,
+                    guard.bbox,
                     health=self.health,
                 )
                 if posture_result.ok:
@@ -451,7 +464,18 @@ class GuardMonitoringPipeline:
             elif pose_result.status is ModuleStatus.DISABLED:
                 posture_result = self._disabled_recorded("posture")
             else:
-                posture_result = self._unknown_recorded("posture", "pose_unavailable")
+                # Pose module error / unavailable: try the bbox-aspect
+                # fallback. It records posture_source='bbox_shape' so no
+                # downstream module treats it as high-confidence.
+                posture_result = safe_run(
+                    "posture",
+                    self.posture_analyzer.analyze,
+                    None,
+                    guard.bbox,
+                    health=self.health,
+                )
+                if posture_result.ok:
+                    posture = posture_result.value
 
             # STEP 5 - phone detector is independent from pose; pose only improves the
             # call/screen-use association heuristic.
@@ -598,27 +622,75 @@ class GuardMonitoringPipeline:
                 events.append(event_result.value.to_dict())
 
         candidate = None
+        activity_decision_basis = "no_guard"
         if guard_seen_now:
             if phone_condition is True:
                 candidate = "Using Mobile"
+                activity_decision_basis = "phone"
             elif sleep_condition is True:
                 candidate = "Sleeping"
-            elif stationary_condition is not None:
-                # Activity meaning for a guard is duty behavior, not only box jitter:
-                # - standing guard = active duty -> Moving
-                # - walking patrol = Moving
-                # - sitting/holding position = Stationary
-                # Sleep and phone have already been handled above.
+                activity_decision_basis = "sleep"
+            else:
+                mapping_mode = self.cfg.get("activity", {}).get("mapping_mode", "evidence")
+                # Debounce: when the previous label was sleep/phone and its
+                # condition just became None, hold the current label until the
+                # ActivityStabilizer expires it naturally. This prevents
+                # briefly snapping to Moving while the grace period winds down.
                 waiting = ((self.activity.label == "Sleeping" and sleep_condition is None
                             and stationary_condition is True)
                            or (self.activity.label == "Using Mobile" and phone_condition is None))
-                if not waiting:
-                    if posture.posture == "standing":
-                        candidate = "Moving"
-                    elif posture.posture == "sitting" and movement.reliable:
-                        candidate = "Stationary"
+                if not waiting and stationary_condition is not None:
+                    if mapping_mode == "legacy":
+                        # Original logic: posture=="standing" unconditionally
+                        # maps to Moving. Preserved exactly as the original so
+                        # operators can opt back in via GUARD_ACTIVITY_MAPPING=legacy.
+                        if posture.posture == "standing":
+                            candidate = "Moving"
+                            activity_decision_basis = "legacy_standing"
+                        elif posture.posture == "sitting" and movement.reliable:
+                            candidate = "Stationary"
+                            activity_decision_basis = "legacy_sitting"
+                        else:
+                            candidate = "Stationary" if stationary_condition else "Moving"
+                            activity_decision_basis = "legacy_movement"
                     else:
-                        candidate = "Stationary" if stationary_condition else "Moving"
+                        # Evidence-based mapping (default):
+                        #   Measured movement is ground truth — it wins
+                        #   unconditionally over posture.
+                        #   Posture is a tiebreaker only when movement is
+                        #   unreliable (camera unknown, edge-truncated box).
+                        if not stationary_condition:
+                            # Guard is actually moving — always "Moving"
+                            # regardless of what the pose model thinks.
+                            candidate = "Moving"
+                            activity_decision_basis = "movement_walking"
+                        elif stationary_condition is True:
+                            # Guard is stationary. Now ask: doing what?
+                            # Sitting = desk guard, resting → Stationary.
+                            # Standing still = alert, waiting → Stationary.
+                            # (Standing still is NOT Moving — that was the bug.)
+                            candidate = "Stationary"
+                            activity_decision_basis = (
+                                "movement_stationary_sitting"
+                                if posture.posture == "sitting"
+                                else "movement_stationary_standing"
+                            )
+                        else:
+                            candidate = None
+                            activity_decision_basis = "movement_unknown"
+                elif not waiting and stationary_condition is None:
+                    # Movement is unknown (camera uncertain, box truncated…).
+                    # Fall back to posture as weak evidence.
+                    if posture.posture == "sitting":
+                        candidate = "Stationary"
+                        activity_decision_basis = "posture_sitting_fallback"
+                    elif posture.posture == "standing":
+                        # Can't distinguish alert-standing from walking
+                        # without movement data; withhold a candidate.
+                        candidate = None
+                        activity_decision_basis = "posture_standing_no_movement"
+                    else:
+                        activity_decision_basis = "all_unknown"
         activity = self.activity.update(candidate, now, present=present)
         annotated = frame.copy()
         rendering = safe_run(
@@ -646,6 +718,8 @@ class GuardMonitoringPipeline:
             "guard_confidence": guard.confidence if guard is not None else None,
             "camera_motion": camera_state,
             "activity_candidate": candidate,
+            "activity_decision_basis": activity_decision_basis,
+            "association_reason": getattr(selector, "last_association_reason", None),
             "sensor_timestamps": {"pose": self.last_pose_at, "phone": self.last_phone_at, "eyes": self.last_eye_at},
             "pose_keypoints": (pose_result.value.keypoints.tolist() if pose_result.ok and pose_result.value is not None else None),
             "timings_ms": self.health.timings_since(timings_before),
@@ -802,12 +876,17 @@ class GuardMonitoringPipeline:
 
     def _draw(self, frame, tracked, guard, duty_zone, patrol_zones, posture,
               movement, phone, eye, sleep, rules, module_results, present):
-        # Drawing reads state only; it never changes observations or event timers.
+        viz = self.cfg.get("visualization", {})
+        if viz.get("draw_all_persons", False) and tracked is not None:
+            selected_id = guard.track_id if guard is not None else None
+            draw_all_persons(frame, tracked, selected_id)
         if guard is not None and present is True:
-            viz = self.cfg.get("visualization", {})
             draw_guard_identity(frame, guard, show_box=viz.get("draw_guard_box", True),
                                 show_id=viz.get("draw_guard_id", True))
             draw_activity_status(frame, self.activity.label, bbox=guard.bbox)
+        if viz.get("draw_hud", False):
+            draw_hud(frame, present=present, activity=self.activity.label,
+                     phone=phone, sleep=sleep, movement=movement)
 
     def _maybe_progress(self, processed: int, total: int) -> None:
         every = max(1, int(self.cfg.get("api", {}).get("progress_every_frames", 25)))

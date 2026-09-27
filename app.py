@@ -57,19 +57,13 @@ def ensure_frontend_deps(frontend_dir):
         print("[INFO] Frontend dependencies already installed.")
 
 
-def main():
-
-    # Existing dependency setup
-    ensure_python_deps()
-
+def create_app():
     from dotenv import load_dotenv
-
     load_dotenv()
-
-    frontend_dir = os.environ["FRONTEND_DIR"]
-
-    # Existing backend
     from Attendance import server
+
+    if getattr(server.app, "_pipeline_routes_registered", False):
+        return server.app
 
 
     # ========================================================
@@ -169,6 +163,16 @@ def main():
     # ========================================================
     # EXISTING CODE - UNCHANGED
     # ========================================================
+
+    server.app._pipeline_routes_registered = True
+    return server.app
+
+
+def main():
+    ensure_python_deps()
+    create_app()
+    frontend_dir = os.environ["FRONTEND_DIR"]
+    from Attendance import server
 
     ensure_frontend_deps(frontend_dir)
 

@@ -20,6 +20,7 @@ class MovementMonitor:
         max_gap_seconds: float = 2.0,
         border_margin_ratio: float = 0.015,
         max_box_scale_change: float = 0.25,
+        min_visible_area_ratio: float = 0.0,
     ):
         self.history_seconds = float(history_seconds)
         self.stationary_radius_ratio = float(stationary_radius_ratio)
@@ -34,6 +35,11 @@ class MovementMonitor:
         self.raw_history = deque()
         self.border_margin_ratio = float(border_margin_ratio)
         self.max_box_scale_change = float(max_box_scale_change)
+        # Soft border rule: when > 0 we do NOT invalidate history the moment
+        # the box merely touches an edge. We only invalidate when the
+        # *visible* (clipped) area is less than this fraction of the
+        # uncropped area. 0 preserves original strict behavior.
+        self.min_visible_area_ratio = float(min_visible_area_ratio)
         self.last_diagonal = None
 
     def reset(self, track_id: int | None = None):
@@ -80,9 +86,20 @@ class MovementMonitor:
         if frame_shape is not None:
             h, w = frame_shape[:2]
             x1, y1, x2, y2 = bbox
-            margin = min(h, w) * self.border_margin_ratio
-            if x1 <= margin or y1 <= margin or x2 >= w - margin or y2 >= h - margin:
-                return uncertain("guard_box_truncated")
+            box_area = max(1.0, (x2 - x1) * (y2 - y1))
+            vx1 = max(0.0, float(x1)); vy1 = max(0.0, float(y1))
+            vx2 = min(float(w), float(x2)); vy2 = min(float(h), float(y2))
+            visible_area = max(0.0, (vx2 - vx1) * (vy2 - vy1))
+            visible_ratio = visible_area / box_area
+            if self.min_visible_area_ratio > 0.0:
+                # Soft rule: keep history unless most of the person is off-frame.
+                if visible_ratio < self.min_visible_area_ratio:
+                    return uncertain("guard_box_truncated")
+            else:
+                # Original strict rule: touching an edge invalidates history.
+                margin = min(h, w) * self.border_margin_ratio
+                if x1 <= margin or y1 <= margin or x2 >= w - margin or y2 >= h - margin:
+                    return uncertain("guard_box_truncated")
         if camera_state is not None:
             if camera_state.get("scene_change"):
                 return uncertain("scene_change")

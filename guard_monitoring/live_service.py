@@ -542,6 +542,12 @@ class GuardLiveService:
             presence_grace_seconds=sel_cfg.get("presence_grace_seconds", 2.0),
             manual_track_id=sel_cfg.get("manual_track_id"),
             candidate_gap_seconds=max(sel_cfg.get("candidate_gap_seconds", 0.5), 1.5 / analysis_fps),
+            reid_enabled=sel_cfg.get("reid_enabled", False),
+            reid_hist_bins=sel_cfg.get("reid_hist_bins", 24),
+            reid_min_similarity=sel_cfg.get("reid_min_similarity", 0.70),
+            reid_max_footpoint_ratio=sel_cfg.get("reid_max_footpoint_ratio", 0.35),
+            reid_update_every_frames=sel_cfg.get("reid_update_every_frames", 5),
+            predict_during_grace=sel_cfg.get("predict_during_grace", False),
         )
         move_cfg = cfg["movement"]
         movement_monitor = MovementMonitor(
@@ -554,6 +560,7 @@ class GuardLiveService:
             max_gap_seconds=move_cfg.get("max_gap_seconds", 2.0),
             border_margin_ratio=move_cfg.get("border_margin_ratio", 0.015),
             max_box_scale_change=move_cfg.get("max_box_scale_change", 0.25),
+            min_visible_area_ratio=move_cfg.get("min_visible_area_ratio", 0.75),
         )
         rules = TimedRuleEngine(pipeline.camera_id, cfg["rules"])
         pipeline.video_fps = analysis_fps

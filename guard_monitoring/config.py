@@ -147,6 +147,23 @@ def load_config(
             "presence_grace_seconds": _float("GUARD_PRESENCE_GRACE_SECONDS", 2.0),
             "manual_track_id": None,
             "candidate_gap_seconds": _float("GUARD_CANDIDATE_GAP_SECONDS", 0.5),
+            # Additive: appearance-based re-identification. When ByteTrack
+            # mints a new track ID for the same person (rotation, brief
+            # occlusion), this lets the selector recognize them as the same
+            # guard using an HSV colour histogram of the torso region.
+            # Defaults keep existing tests passing (no behavior change for
+            # scripted detections that never introduce competing IDs).
+            "reid_enabled": _bool("GUARD_REID_ENABLED", True),
+            "reid_hist_bins": _int("GUARD_REID_HIST_BINS", 24),
+            "reid_min_similarity": _float("GUARD_REID_MIN_SIMILARITY", 0.70),
+            "reid_max_footpoint_ratio": _float("GUARD_REID_MAX_FOOTPOINT_RATIO", 0.35),
+            "reid_update_every_frames": _int("GUARD_REID_UPDATE_EVERY_FRAMES", 5),
+            # Additive: constant-velocity Kalman prediction of the retained
+            # bbox during the presence-grace window. Off by default because
+            # existing regression tests assert that presence expiry stops
+            # any drawing; a "predicted" box could be seen as fabrication.
+            # Enable per-deployment when operators want continuous overlay.
+            "predict_during_grace": _bool("GUARD_PREDICT_DURING_GRACE", True),
         },
         "camera_motion": {
             # Unverified camera motion cannot be interpreted as guard movement.
@@ -171,6 +188,14 @@ def load_config(
             "smoothing_seconds": _float("GUARD_MOVEMENT_SMOOTHING_SECONDS", 0.25),
             "radius_quantile": _float("GUARD_MOVEMENT_RADIUS_QUANTILE", 0.90),
             "max_gap_seconds": _float("GUARD_MAX_EVIDENCE_GAP_SECONDS", 2.0),
+            # Additive: soft border rule. When >0 the monitor no longer
+            # invalidates history the moment the bbox merely touches an
+            # image edge - it only invalidates when the visible bbox area
+            # is smaller than this fraction of the (uncropped) bbox area.
+            # 0 disables the soft rule and restores the original strict
+            # touch-the-edge behavior. Default 0.75 keeps history when the
+            # guard is >=75% inside the frame.
+            "min_visible_area_ratio": _float("GUARD_MOVEMENT_MIN_VISIBLE_AREA", 0.75),
         },
         "pose_logic": {
             "keypoint_confidence": _float("GUARD_KEYPOINT_CONFIDENCE", 0.25),
@@ -178,11 +203,27 @@ def load_config(
             "standing_knee_angle_min_deg": _float("GUARD_STANDING_KNEE_MIN_DEG", 155.0),
             "torso_lean_deg": _float("GUARD_TORSO_LEAN_DEG", 28.0),
             "head_down_ratio": _float("GUARD_HEAD_DOWN_RATIO", 0.32),
+            # Additive: when knees/ankles are invalid (typical desk/counter
+            # occlusion) infer 'sitting' from a short/wide bbox aspect ratio.
+            # A cleanly standing person's bbox is ~2.5:1 tall; sitting behind
+            # a desk drops the visible aspect toward ~1.2:1. Setting this
+            # below the smaller of the two disables the fallback.
+            "sitting_aspect_ratio_max": _float("GUARD_SITTING_ASPECT_MAX", 1.55),
+            "standing_aspect_ratio_min": _float("GUARD_STANDING_ASPECT_MIN", 2.10),
+            "aspect_fallback_enabled": _bool("GUARD_POSTURE_ASPECT_FALLBACK", True),
         },
         "phone_logic": {
             "guard_box_expand_ratio": _float("GUARD_PHONE_BOX_EXPAND_RATIO", 0.10),
             "hand_distance_ratio": _float("GUARD_PHONE_HAND_DISTANCE_RATIO", 0.22),
             "head_distance_ratio": _float("GUARD_PHONE_HEAD_DISTANCE_RATIO", 0.20),
+            # Additive: also run the phone detector on tight crops centred
+            # on visible wrists, so a phone held close to the body (or
+            # outside a stale/imprecise guard bbox) is not missed. The
+            # crop's short side is this fraction of the guard bbox
+            # diagonal. Set to 0 to disable.
+            "wrist_crop_ratio": _float("GUARD_PHONE_WRIST_CROP_RATIO", 0.28),
+            "wrist_crop_min_confidence": _float("GUARD_PHONE_WRIST_CROP_CONFIDENCE", 0.15),
+            "wrist_crop_accept_ratio": _float("GUARD_PHONE_WRIST_ACCEPT_RATIO", 1.4),
         },
         "sleep_logic": {
             "perclos_window_seconds": _float("GUARD_PERCLOS_WINDOW_SECONDS", 30.0),
@@ -223,6 +264,14 @@ def load_config(
             "sleep_confirm_seconds": _float("GUARD_ACTIVITY_SLEEP_CONFIRM_SECONDS", 0.4),
             "hold_seconds": _float("GUARD_ACTIVITY_HOLD_SECONDS", 1.0),
             "max_evidence_gap_seconds": _float("GUARD_MAX_EVIDENCE_GAP_SECONDS", 2.0),
+            # Additive: how activity is derived from posture/movement.
+            #   "legacy"   - original mapping (standing => Moving)
+            #   "evidence" - measured movement wins over posture; posture
+            #                is a tiebreaker when movement is unknown.
+            # Default is 'evidence' because 'legacy' relabels a still,
+            # standing guard as "Moving" which is what the existing
+            # test_normal_standing_is_stationary regression already flags.
+            "mapping_mode": _env("GUARD_ACTIVITY_MAPPING", "evidence"),
         },
         "visualization": {
             "draw_guard_box": _bool("GUARD_DRAW_GUARD_BOX", True),
@@ -233,6 +282,16 @@ def load_config(
             # Legacy options remain parseable for configuration compatibility.
             # The pipeline renders the selected guard box, ID and activity only.
             "draw_panel": _bool("GUARD_DRAW_PANEL", False),
+            # Additive: draw a thin grey box + "person #N" tag for every
+            # tracked person that is not the currently selected guard.
+            # Activity is never guessed for these boxes (they are not
+            # analyzed for phone/pose/sleep). Off by default keeps the
+            # existing regression tests unchanged.
+            "draw_all_persons": _bool("GUARD_DRAW_ALL_PERSONS", True),
+            # Additive: bottom-left status HUD summarizing present/activity/
+            # phone/sleep/movement. Useful when the guard box is briefly off
+            # frame; off by default to keep tests deterministic.
+            "draw_hud": _bool("GUARD_DRAW_HUD", False),
         },
         "modules": {
             "guard_detection": {"enabled": _bool("GUARD_DETECTION_ENABLED", True)},
@@ -329,6 +388,29 @@ def validate_config(cfg: dict[str, Any]) -> None:
     for key in ("sleep_seconds", "phone_seconds", "stationary_seconds", "absence_seconds"):
         if float(cfg["rules"][key]) < 0:
             raise ValueError(f"rules.{key} must be >= 0")
+    # Additive keys - keep validation permissive so old configs still load.
+    selection = cfg["guard_selection"]
+    if not 0 < float(selection.get("reid_min_similarity", 0.7)) <= 1:
+        raise ValueError("guard_selection.reid_min_similarity must be in (0, 1]")
+    if float(selection.get("reid_max_footpoint_ratio", 0.35)) < 0:
+        raise ValueError("guard_selection.reid_max_footpoint_ratio must be >= 0")
+    if int(selection.get("reid_hist_bins", 24)) < 4:
+        raise ValueError("guard_selection.reid_hist_bins must be >= 4")
+    pose_logic = cfg["pose_logic"]
+    if float(pose_logic.get("sitting_aspect_ratio_max", 1.55)) >= float(
+        pose_logic.get("standing_aspect_ratio_min", 2.1)
+    ):
+        raise ValueError(
+            "pose_logic.sitting_aspect_ratio_max must be < standing_aspect_ratio_min"
+        )
+    phone_logic = cfg["phone_logic"]
+    if float(phone_logic.get("wrist_crop_ratio", 0.28)) < 0:
+        raise ValueError("phone_logic.wrist_crop_ratio must be >= 0")
+    movement = cfg["movement"]
+    if not 0 <= float(movement.get("min_visible_area_ratio", 0.75)) <= 1:
+        raise ValueError("movement.min_visible_area_ratio must be in [0, 1]")
+    if cfg["activity"].get("mapping_mode", "evidence") not in {"legacy", "evidence"}:
+        raise ValueError("activity.mapping_mode must be 'legacy' or 'evidence'")
 
 
 def _validate_polygon(points: list[list[float]], name: str) -> None:
