@@ -15,3 +15,6 @@ supervision
 trackers
 ultralytics
 mediapipe
+pyyaml
+huggingface_hub
+lap

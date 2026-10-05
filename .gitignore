@@ -48,5 +48,13 @@ local_data/restricted_zone/snapshots/*
 local_data/restricted_zone/outputs/*
 !local_data/restricted_zone/outputs/.gitkeep
 
+# ALPR job runtime data
+local_data/alpr/uploads/*
+!local_data/alpr/uploads/.gitkeep
+local_data/alpr/outputs/*
+!local_data/alpr/outputs/.gitkeep
+local_data/alpr/*.sqlite3
+local_data/alpr/*.sqlite3-*
+
 # Model weights are intentionally tracked (via Git LFS, see .gitattributes) so a
 # fresh clone + `python app.py` works with no manual file copying.

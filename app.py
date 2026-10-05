@@ -135,6 +135,25 @@ def create_app():
 
 
     # ========================================================
+    # NEW - ALPR (AUTOMATIC LICENSE PLATE RECOGNITION) ROUTER
+    # ========================================================
+
+    from Plate_detector.api import (
+        router as alpr_router,
+    )
+
+    server.app.include_router(
+        alpr_router,
+        prefix="/api/alpr",
+        tags=["ALPR"],
+    )
+
+    print(
+        "[INFO] ALPR API added at /api/alpr"
+    )
+
+
+    # ========================================================
     # NEW - SAMPLE VIDEOS (shared across every pipeline's frontend)
     # ========================================================
 

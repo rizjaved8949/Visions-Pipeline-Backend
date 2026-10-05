@@ -1,0 +1,71 @@
+# ============================================================
+#  ALPR pipeline configuration
+#  Every value here can be overridden from the command line,
+#  e.g.  python main.py --source rtsp://... --mode enhance
+# ============================================================
+
+# ---------- Input ----------
+source: 0                 # 0 = first webcam | path/to/video.mp4 | rtsp://user:pass@ip:554/stream
+drop_frames: auto         # auto = drop for live streams, keep all frames for files. true/false to force.
+reconnect: true           # auto-reconnect dropped RTSP/HTTP streams
+
+# ---------- Hardware ----------
+device: 0                 # 0 = first CUDA GPU, "cpu" to force CPU
+half: true                # FP16 inference on GPU (2x faster, negligible accuracy loss)
+
+# ---------- Stage 1: vehicle detection + tracking ----------
+vehicle:
+  weights: weights/yolo11m.pt     # any Ultralytics COCO model: yolo11n/s/m/l/x.pt  (n = fastest, x = most accurate)
+  imgsz: 640                      # inference size; 640 is faster, 1280 catches smaller/farther vehicles (was 960 - too slow for dense 4K traffic on a 4GB GPU)
+  conf: 0.35
+  iou: 0.5
+  classes: [1, 2, 3, 5, 7]        # COCO ids: 1 bicycle, 2 car, 3 motorcycle, 5 bus, 7 truck
+  tracker: botsort.yaml           # bytetrack.yaml (fast) or botsort.yaml (better re-id under occlusion) - switched to botsort so a vehicle keeps its track ID through brief occlusion instead of becoming a duplicate result under a new ID; costs some speed
+  min_box_px: 60                  # ignore vehicles smaller than this (px, longest side) - plate would be unreadable anyway
+
+# ---------- Stage 2: plate detection (runs on vehicle crops) ----------
+plate:
+  weights: weights/plate_detector_finetuned.pt   # fine-tuned on CCPD (see plate-finetune/runs/plates); old pretrained one kept at weights/plate_detector.pt to revert if needed
+  imgsz: 416                           # crops are small; 320-640
+  conf: 0.50                           # Day 2 measured: at 0.15 the detector emitted junk boxes (mirrors, wipers, sun glare) that won their track and got saved. Raising to 0.50 took crop purity 81.2% -> 96.6% across 3 clips AND *increased* genuine plates found 26 -> 28, because suppressing a weak junk box lets the tracker keep looking and catch the real plate later in the track. Do not lower without re-measuring purity.
+  conf_floor: 0.50                     # DISABLED by default (equal to conf). When set LOWER than conf, a track that never gets a confident plate still writes its best weak detection to output/plates_lowconf/ for review. Useful as a diagnostic on hard footage (recovered 5 otherwise-invisible plates on a night-stress clip). BUT measured cost: lowering the predict threshold feeds more boxes into NMS, which suppressed the correct high-confidence box on 2 tracks and cost 2 genuine plates from the main folder. Enable only for diagnostic runs, not production.
+  crop_margin: 0.10                    # expand vehicle box by 10% before searching for a plate
+  every_n_frames: 1                    # run plate detector every N frames per track (2-3 saves GPU in very dense traffic) - reverted to 1: confirmed a plate detectable on only one narrow frame window got missed entirely when that frame fell on a skipped parity. Only raise this if you accept that risk in exchange for speed.
+  min_width_px: 40                     # plates narrower than this are skipped as hopeless
+  quality_width_saturation_px: 100     # plate px-width at which the quality score stops rewarding size further; tune down for cameras where vehicles are usually far (small plates), up for close/dashcam setups
+  roof_exclude_frac: 0.30              # reject candidates whose vertical center is within this fraction of the vehicle crop's top (rejects roof-mounted taxi signs etc.) - real plates sit low
+  min_aspect_ratio: 1.5                # reject candidates narrower (width/height) than this - rejects square/blob-shaped false positives (taillights, bumper clutter); real plates measured 1.7-3.6
+
+# ---------- Stage 3: tracking logic (no duplicates) ----------
+tracking:
+  stable_frames: 12        # finalize a track when its best plate hasn't improved for this many frames
+  lost_frames: 40          # finalize (with whatever we have) when a track vanishes for this many frames - higher survives brief occlusion without a track-ID switch
+  max_attempts: 600        # give up on a track after this many frames without any plate - raised from 90: a real, clearly-visible plate was confirmed missed because it only became legible ~200 frames after the vehicle first appeared (bad angle/distance early on), and the track had already been given up on and permanently excluded from further plate attempts by then
+  keep_top_k: 3            # keep the K best plate crops per track (used for OCR majority vote)
+  min_score_to_save: 0.08  # quality score threshold; lower = save more (noisier) plates
+
+# ---------- Stage 4: enhancement ----------
+enhance:
+  method: fsrcnn           # fsrcnn | espcn | classic  (classic = cubic upscale + sharpen, no model needed)
+  scale: 4                 # 2, 3 or 4
+  model_dir: weights/sr    # where setup_weights.py puts FSRCNN_x4.pb etc.
+  target_width: 400        # final width of saved plate image (after SR, resized here)
+  clahe: true              # contrast equalization (helps night / low-contrast plates)
+  sharpen: 0.6             # unsharp-mask strength, 0 = off
+  deskew: true             # straighten slightly rotated plates
+
+# ---------- Output ----------
+output:
+  dir: output
+  save_raw_plate: true       # also save the un-enhanced crop for comparison
+  save_vehicle_crop: false   # save the vehicle crop the plate came from
+  save_video: true           # write an annotated review video to output/annotated_<source>.mp4. Shows vehicle boxes + track IDs, plate boxes labelled with their CONFIDENCE (the number plate.conf compares against), and each track's outcome: saved / low-conf (quarantined) / no plate. Lets a run be diagnosed afterwards instead of only from the saved crops. Costs throughput and disk (~160 MB for a 4K clip); set false for headless production.
+  csv: results.csv
+
+# ---------- Display ----------
+display:
+  show: true
+  window_name: "ALPR"
+  max_width: auto            # auto = fit the window to your actual screen. A number caps it instead. Does not affect inference.
+  max_height: auto           # auto = 90% of screen height. Height must be capped as well as width: a portrait 4K source (2160x3840) limited on width alone is still ~2275 px tall, so the window runs off-screen and you only see a slice of the frame, which looks cropped/zoomed. NOTE: a 9:16 source is phone-shaped by nature - it can be made bigger, but not wider, without cropping or distorting it.
+  show_fps: true

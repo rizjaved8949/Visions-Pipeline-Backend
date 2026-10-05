@@ -1,0 +1,9 @@
+# Install PyTorch with CUDA FIRST (see README), then:  pip install -r requirements.txt
+ultralytics>=8.3.0
+opencv-contrib-python>=4.9.0      # "contrib" is required for dnn_superres (FSRCNN/ESPCN)
+numpy>=1.24
+pyyaml>=6.0
+huggingface_hub>=0.23             # downloads the pretrained plate detector
+requests>=2.31
+lap>=0.4                          # ByteTrack / BoT-SORT dependency used by ultralytics
+# easyocr intentionally NOT required: this module is detection-only and never reads text.
