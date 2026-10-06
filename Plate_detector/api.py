@@ -198,12 +198,32 @@ def get_annotated_video(job_id: str):
 
 @router.get("/jobs/{job_id}/plates")
 def get_plates(job_id: str):
+    """Always reads the job's results.csv fresh, live - the worker thread
+    rewrites it every time a track finalizes (see ResultWorker._process in
+    alpr/pipeline.py), so this reflects plates saved so far even while the
+    job is still processing, not only once it's fully completed."""
     _require_enabled()
     job = _job_or_404(job_id)
-    if job.summary is None:
-        raise HTTPException(status_code=409, detail=f"Plates not ready; status={job.status}")
+
+    from .module import ALPRModule
+
+    csv_path = Path(job.output_dir) / "results.csv"
+    raw_plates: list[dict] = []
+    for attempt in range(5):
+        try:
+            raw_plates = ALPRModule._read_plates(csv_path)
+            break
+        except Exception:  # noqa: BLE001 - a half-written row mid-rewrite; retry
+            if attempt == 4:
+                raw_plates = []
+                break
+            time.sleep(0.01)
+
     plates = []
-    for p in job.summary.get("plates", []):
+    lowconf = 0
+    for p in raw_plates:
+        if p.get("low_conf"):
+            lowconf += 1
         plates.append({
             **p,
             "image_url": f"/api/alpr/jobs/{job_id}/plates/{Path(p['image']).name}" if p.get("image") else None,
@@ -211,7 +231,8 @@ def get_plates(job_id: str):
                 f"/api/alpr/jobs/{job_id}/plates/{Path(p['raw_image']).name}" if p.get("raw_image") else None
             ),
         })
-    return {"job_id": job_id, "plates": plates, "counts": job.summary.get("counts", {})}
+    counts = {"plates_saved": len(plates) - lowconf, "lowconf_quarantined": lowconf}
+    return {"job_id": job_id, "plates": plates, "counts": counts}
 
 
 @router.get("/jobs/{job_id}/plates/{filename}")
