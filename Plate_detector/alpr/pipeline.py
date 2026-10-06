@@ -33,6 +33,8 @@ from .tracker import TrackManager, TrackState
 from .vehicle_detector import VehicleDetector
 from .visualize import draw, fit_scale, resize_for_display, screen_size
 
+from system_settings import get_display_prefs
+
 
 def _make_writer(path, width, height, fps):
     """mp4v (OpenCV's always-available MPEG-4 Part 2 encoder) is not decodable by
@@ -182,6 +184,13 @@ class ALPRPipeline:
         self.worker = ResultWorker(cfg, self.enhancer)
         self.worker.start()
 
+        # Workspace-wide Display preferences (Settings page) - read once per
+        # job, not per frame.
+        display_prefs = get_display_prefs()
+        self.show_detection_boxes = bool(display_prefs.get("show_detection_boxes", True))
+        self.show_labels = bool(display_prefs.get("show_labels", True))
+        self.show_confidence = bool(display_prefs.get("show_confidence", True))
+
     # ------------------------------------------------------------------ #
     def run(self, stop_event=None, progress_callback=None, latest_frame_path=None):
         """Blocking. `stop_event` (threading.Event) lets a host shut it down cleanly
@@ -282,7 +291,10 @@ class ALPRPipeline:
                 # ---- Draw / show / save
                 if cfg.display.show or writer is not None or latest_frame_path is not None:
                     annotated = draw(frame, self.tracks.active(frame_id), fps,
-                                     self.worker.in_q.qsize())
+                                     self.worker.in_q.qsize(),
+                                     show_boxes=self.show_detection_boxes,
+                                     show_labels=self.show_labels,
+                                     show_confidence=self.show_confidence)
                     if writer is not None:
                         writer.write(annotated)
                     if latest_frame_path is not None:

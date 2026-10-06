@@ -28,6 +28,8 @@ from .monitoring.sleep import SleepAnalyzer
 from .types import EyeState, MovementState, PhoneState, PostureState, SleepState
 from .visualization.overlay import draw_activity_status, draw_all_persons, draw_guard_box_and_status, draw_guard_identity, draw_hud
 
+from system_settings import get_display_prefs
+
 ProgressCallback = Callable[[dict], None]
 
 
@@ -76,6 +78,13 @@ class GuardMonitoringPipeline:
 
         self.activity = ActivityStabilizer(cfg.get("activity", {}))
         self.camera_motion = CameraMotionEstimator(cfg.get("camera_motion", {}))
+
+        # Workspace-wide Display preferences (Settings page) - read once per
+        # job, not per frame. show_confidence has nothing to gate here: this
+        # module's real-mode overlay never draws a numeric confidence value.
+        display_prefs = get_display_prefs()
+        self.show_detection_boxes = bool(display_prefs.get("show_detection_boxes", True))
+        self.show_labels = bool(display_prefs.get("show_labels", True))
         self.last_identity = None
         self.last_track_id = None
         self.last_pose: ModuleResult = unknown("pose_not_run")
@@ -87,7 +96,10 @@ class GuardMonitoringPipeline:
         self.last_pose_at = self.last_phone_at = self.last_eye_at = None
         self.last_eye_timestamp_ms = -1
 
-    def run(self) -> dict:
+    def run(self, stop_event=None) -> dict:
+        """`stop_event` (threading.Event), if given, is checked once per
+        frame so a host can cancel a long job early - e.g. on Ctrl+C, or a
+        user-initiated stop. Without this the loop only exits at EOF."""
         source = str(self.cfg["input"]["source"])
         cap = open_capture(source)
         width, height, fps = video_metadata(cap)
@@ -167,6 +179,8 @@ class GuardMonitoringPipeline:
         with JsonlWriter(frame_log_path) as frame_log, JsonlWriter(event_log_path) as event_log:
             try:
                 while True:
+                    if stop_event is not None and stop_event.is_set():
+                        break
                     decode_started = time.perf_counter()
                     ok_read, frame = cap.read()
                     self.health.record("video_decode", ok(ok_read), (time.perf_counter()-decode_started)*1000.0)
@@ -878,7 +892,7 @@ class GuardMonitoringPipeline:
               movement, phone, eye, sleep, rules, module_results, present):
         viz = self.cfg.get("visualization", {})
         # draw_all_persons is intentionally a no-op — only the guard is annotated.
-        if guard is not None and present is True:
+        if guard is not None and present is True and self.show_detection_boxes:
             # draw_guard_identity with show_id=False keeps the mock-able call
             # that regression tests rely on, but hides "GUARD ID"/"last seen"
             # from real video output. Status labels are rendered by
@@ -891,7 +905,9 @@ class GuardMonitoringPipeline:
             # operation this draws nothing because bbox draws are now handled
             # entirely by draw_guard_box_and_status below.
             draw_activity_status(frame, self.activity.label, bbox=guard.bbox)
-            statuses = self._active_statuses(phone, sleep, movement, posture)
+            # Workspace "Show labels" preference: box still drawn, just no
+            # status pills (Sleeping/Moving/etc.) inside it when off.
+            statuses = self._active_statuses(phone, sleep, movement, posture) if self.show_labels else []
             draw_guard_box_and_status(frame, guard, statuses)
         # When present is False (presence window expired): draw NOTHING.
         # The test test_retained_identity_overlay_expires_with_presence

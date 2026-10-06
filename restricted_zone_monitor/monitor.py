@@ -26,6 +26,7 @@ from typing import List, Optional
 import cv2
 
 from guard_monitoring.io import make_writer
+from system_settings import get_display_prefs
 
 from . import config
 from .breach import BreachManager
@@ -211,6 +212,20 @@ def stop_session() -> dict:
     return get_status()
 
 
+def stop_all() -> None:
+    """Stop the active session if there is one - used on app shutdown
+    (Ctrl+C), same interface as the other modules' JobService.stop_all(),
+    so a running capture loop doesn't keep a non-daemon worker thread alive
+    long after the user asked the process to exit."""
+    with session_lock:
+        active = is_capturing and current_session is not None
+    if active:
+        try:
+            stop_session()
+        except ValueError:
+            pass
+
+
 def _ensure_capture_thread() -> None:
     global _capture_thread
     if _capture_thread is None or not _capture_thread.is_alive():
@@ -256,6 +271,13 @@ def _capture_loop() -> None:
     capture_thread_running = True
     frame_idx = 0
     session_id = session["session_id"]
+
+    # Workspace-wide Display preferences (Settings page) - read once per
+    # session, not per frame.
+    display_prefs = get_display_prefs()
+    show_boxes = bool(display_prefs.get("show_detection_boxes", True))
+    show_labels = bool(display_prefs.get("show_labels", True))
+    show_confidence = bool(display_prefs.get("show_confidence", True))
     snap_dir = os.path.join(str(config.SNAPSHOT_DIR), str(session_id))
     os.makedirs(snap_dir, exist_ok=True)
 
@@ -288,7 +310,9 @@ def _capture_loop() -> None:
 
             active = {zn for zl in inside_map.values() for zn in zl}
             draw_zones(frame, zones, active)
-            draw_detections(frame, dets, inside_map, anchor=config.ANCHOR)
+            draw_detections(frame, dets, inside_map, anchor=config.ANCHOR,
+                             show_boxes=show_boxes, show_labels=show_labels,
+                             show_confidence=show_confidence)
 
             for ev in events:
                 banner.trigger(f"BREACH: {ev.cls_name} #{ev.track_id} entered {ev.zone.name}")

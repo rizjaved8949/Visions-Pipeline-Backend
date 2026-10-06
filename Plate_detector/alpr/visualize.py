@@ -19,7 +19,11 @@ def _label(img, text, x, y, color, scale=0.55, thick=1):
     cv2.putText(img, text, (x + 2, y0 - 2), cv2.FONT_HERSHEY_SIMPLEX, scale, (0, 0, 0), thick, cv2.LINE_AA)
 
 
-def draw(frame, tracks: dict, fps: float | None = None, pending: int = 0):
+def draw(frame, tracks: dict, fps: float | None = None, pending: int = 0,
+         show_boxes: bool = True, show_labels: bool = True, show_confidence: bool = True):
+    """show_boxes/show_labels/show_confidence mirror the workspace-wide
+    Display preferences (Settings page) - read once per job, not per frame,
+    by whoever calls this."""
     # Fixed sizes on purpose. Scaling these with frame height was tried and reverted:
     # on a 2160x3840 source it multiplied everything by 3.5x and the labels swamped the
     # picture. Legibility of the saved 4K video is not worth making the live view unusable.
@@ -31,7 +35,8 @@ def draw(frame, tracks: dict, fps: float | None = None, pending: int = 0):
             continue
         x1, y1, x2, y2 = map(int, t.last_vehicle_box)
         color = CLS_COLORS.get(t.cls_name, (200, 200, 200))
-        cv2.rectangle(frame, (x1, y1), (x2, y2), color, box_th)
+        if show_boxes:
+            cv2.rectangle(frame, (x1, y1), (x2, y2), color, box_th)
 
         status = ""
         if t.result_status == "done":
@@ -42,8 +47,9 @@ def draw(frame, tracks: dict, fps: float | None = None, pending: int = 0):
             status = " | low-conf (quarantined)"
         elif t.result_status == "skipped":
             status = " | no plate"
-        _label(frame, f"#{tid} {t.cls_name}{status}", x1, y1,
-               color if not status.endswith("saved") else DONE_COLOR, scale=s_lbl, thick=th)
+        if show_labels:
+            _label(frame, f"#{tid} {t.cls_name}{status}", x1, y1,
+                   color if not status.endswith("saved") else DONE_COLOR, scale=s_lbl, thick=th)
 
         if t.last_plate_box is not None:
             px1, py1, px2, py2 = map(int, t.last_plate_box)
@@ -51,8 +57,9 @@ def draw(frame, tracks: dict, fps: float | None = None, pending: int = 0):
                 box_col, thick = DONE_COLOR, max(1, box_th // 2)
             else:
                 box_col, thick = PLATE_COLOR, box_th
-            cv2.rectangle(frame, (px1, py1), (px2, py2), box_col, thick)
-            if t.last_plate_conf:
+            if show_boxes:
+                cv2.rectangle(frame, (px1, py1), (px2, py2), box_col, thick)
+            if t.last_plate_conf and show_labels and show_confidence:
                 # confidence is the single most useful number when diagnosing a miss or a
                 # false positive, since plate.conf is what decides whether it is kept
                 _label(frame, f"{t.last_plate_conf:.2f}", px1, max(12, py1 - 2),

@@ -12,6 +12,7 @@ from pathlib import Path
 import cv2
 
 from guard_monitoring.io import make_writer
+from system_settings import get_display_prefs
 
 from .config import (
     DEVICE,
@@ -430,6 +431,13 @@ class KitchenPipeline:
         self.temporal = (
             TemporalState()
         )
+
+        # Workspace-wide Display preferences (Settings page) - read once per
+        # session, not per frame.
+        display_prefs = get_display_prefs()
+        self.show_detection_boxes = bool(display_prefs.get("show_detection_boxes", True))
+        self.show_labels = bool(display_prefs.get("show_labels", True))
+        self.show_confidence = bool(display_prefs.get("show_confidence", True))
 
 
         self.display_ids = {}
@@ -1191,51 +1199,51 @@ class KitchenPipeline:
             ]
 
 
-            cv2.rectangle(
-                output,
-                (
-                    x1,
-                    y1,
-                ),
-                (
-                    x2,
-                    y2,
-                ),
-                (
-                    230,
-                    180,
-                    50,
-                ),
-                1,
-            )
-
-
-            text = (
-                f"{detection['class_name']} "
-                f"{detection['confidence']:.2f}"
-            )
-
-
-            cv2.putText(
-                output,
-                text,
-                (
-                    x1,
-                    max(
-                        18,
-                        y1 - 5,
+            if self.show_detection_boxes:
+                cv2.rectangle(
+                    output,
+                    (
+                        x1,
+                        y1,
                     ),
-                ),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.42,
-                (
-                    230,
-                    180,
-                    50,
-                ),
-                1,
-                cv2.LINE_AA,
-            )
+                    (
+                        x2,
+                        y2,
+                    ),
+                    (
+                        230,
+                        180,
+                        50,
+                    ),
+                    1,
+                )
+
+
+            if self.show_labels:
+                text = detection['class_name']
+                if self.show_confidence:
+                    text += f" {detection['confidence']:.2f}"
+
+                cv2.putText(
+                    output,
+                    text,
+                    (
+                        x1,
+                        max(
+                            18,
+                            y1 - 5,
+                        ),
+                    ),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.42,
+                    (
+                        230,
+                        180,
+                        50,
+                    ),
+                    1,
+                    cv2.LINE_AA,
+                )
 
 
         # Person states
@@ -1279,89 +1287,91 @@ class KitchenPipeline:
                 )
 
 
-            cv2.rectangle(
-                output,
-                (
-                    x1,
-                    y1,
-                ),
-                (
-                    x2,
-                    y2,
-                ),
-                color,
-                2,
-            )
-
-
-            label = (
-                f"{person['staff_label']} "
-                f"- {overall.upper()}"
-            )
-
-
-            cv2.putText(
-                output,
-                label,
-                (
-                    x1,
-                    max(
-                        22,
-                        y1 - 26,
+            if self.show_detection_boxes:
+                cv2.rectangle(
+                    output,
+                    (
+                        x1,
+                        y1,
                     ),
-                ),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.55,
-                color,
-                2,
-                cv2.LINE_AA,
-            )
-
-
-            def symbol(
-                requirement,
-            ):
-
-                state = (
-                    person[
-                        requirement
-                    ][
-                        "state"
-                    ]
+                    (
+                        x2,
+                        y2,
+                    ),
+                    color,
+                    2,
                 )
 
-                if state == "compliant":
-                    return "OK"
 
-                if state == "violation":
-                    return "NO"
-
-                return "?"
-
-
-            details = (
-                f"M:{symbol('mask')} "
-                f"G:{symbol('gloves')} "
-                f"H:{symbol('hair_cover')}"
-            )
+            if self.show_labels:
+                label = (
+                    f"{person['staff_label']} "
+                    f"- {overall.upper()}"
+                )
 
 
-            cv2.putText(
-                output,
-                details,
-                (
-                    x1,
-                    max(
-                        42,
-                        y1 - 7,
+                cv2.putText(
+                    output,
+                    label,
+                    (
+                        x1,
+                        max(
+                            22,
+                            y1 - 26,
+                        ),
                     ),
-                ),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.45,
-                color,
-                1,
-                cv2.LINE_AA,
-            )
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.55,
+                    color,
+                    2,
+                    cv2.LINE_AA,
+                )
+
+
+                def symbol(
+                    requirement,
+                ):
+
+                    state = (
+                        person[
+                            requirement
+                        ][
+                            "state"
+                        ]
+                    )
+
+                    if state == "compliant":
+                        return "OK"
+
+                    if state == "violation":
+                        return "NO"
+
+                    return "?"
+
+
+                details = (
+                    f"M:{symbol('mask')} "
+                    f"G:{symbol('gloves')} "
+                    f"H:{symbol('hair_cover')}"
+                )
+
+
+                cv2.putText(
+                    output,
+                    details,
+                    (
+                        x1,
+                        max(
+                            42,
+                            y1 - 7,
+                        ),
+                    ),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.45,
+                    color,
+                    1,
+                    cv2.LINE_AA,
+                )
 
 
         return output

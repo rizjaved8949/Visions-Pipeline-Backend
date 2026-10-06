@@ -56,5 +56,9 @@ local_data/alpr/outputs/*
 local_data/alpr/*.sqlite3
 local_data/alpr/*.sqlite3-*
 
+# Workspace preferences (Notifications/Display) - persisted runtime state,
+# defaults are in code so a missing file just falls back to them.
+local_data/preferences.json
+
 # Model weights are intentionally tracked (via Git LFS, see .gitattributes) so a
 # fresh clone + `python app.py` works with no manual file copying.

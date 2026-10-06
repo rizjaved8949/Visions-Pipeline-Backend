@@ -2,6 +2,7 @@ import os
 import subprocess
 import sys
 import threading
+import time
 
 
 MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -154,6 +155,23 @@ def create_app():
 
 
     # ========================================================
+    # NEW - SYSTEM SETTINGS (pipeline on/off, notification/display prefs)
+    # ========================================================
+
+    from system_settings import router as system_settings_router
+
+    server.app.include_router(
+        system_settings_router,
+        prefix="/api/system",
+        tags=["System Settings"],
+    )
+
+    print(
+        "[INFO] System Settings API added at /api/system"
+    )
+
+
+    # ========================================================
     # NEW - SAMPLE VIDEOS (shared across every pipeline's frontend)
     # ========================================================
 
@@ -214,8 +232,69 @@ def main():
         frontend_process.wait()
 
     except KeyboardInterrupt:
-        print("\n[INFO] Shutting down frontend...")
+        print("\n[INFO] Shutting down...")
         frontend_process.terminate()
+        stop_all_jobs()
+        _wait_for_jobs_to_stop(timeout=8.0)
+        # Force-exit rather than falling through to normal interpreter
+        # shutdown: any job thread that didn't notice its stop_event in time
+        # is non-daemon and would otherwise keep the process alive
+        # indefinitely. Everything reachable has already been asked to stop
+        # above - this is just the guaranteed upper bound on how long
+        # Ctrl+C can take.
+        os._exit(0)
+
+
+def _wait_for_jobs_to_stop(timeout: float) -> None:
+    """Give signalled jobs a bounded window to actually exit their worker
+    threads before the caller force-exits regardless."""
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        lingering = [
+            t for t in threading.enumerate()
+            if t is not threading.main_thread() and not t.daemon
+        ]
+        if not lingering:
+            return
+        time.sleep(0.2)
+
+
+def stop_all_jobs():
+    """Signal every currently-running backend job/session across all
+    modules to stop immediately, instead of letting their worker threads
+    (non-daemon - concurrent.futures.ThreadPoolExecutor's defaults) keep
+    processing to completion after Ctrl+C. Without this, the process used
+    to stay alive - invisibly, with the frontend already gone - until
+    whatever video was mid-processing finished on its own, sometimes
+    minutes later, and could even crash on the way out (a model's internal
+    executor torn down by interpreter shutdown while a frame was still
+    in flight). Each call is best-effort and independent so one module's
+    failure can't block the others from being signalled."""
+    print("[INFO] Stopping any in-progress jobs...")
+
+    try:
+        from guard_monitoring.service import get_service as get_guard_service
+        get_guard_service().stop_all()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[WARN] Could not stop Guard jobs: {exc}")
+
+    try:
+        from kitchen_monitoring.service import SERVICE as kitchen_service
+        kitchen_service.stop_all()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[WARN] Could not stop Kitchen sessions: {exc}")
+
+    try:
+        from restricted_zone_monitor import monitor as restricted_zone_monitor_state
+        restricted_zone_monitor_state.stop_all()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[WARN] Could not stop Restricted Zone session: {exc}")
+
+    try:
+        from Plate_detector.service import get_service as get_alpr_service
+        get_alpr_service().stop_all()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[WARN] Could not stop ALPR jobs: {exc}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import os
 import threading
 from typing import Any, Dict
 
@@ -14,6 +15,18 @@ REPORT_MEDIA_TYPES = {
     "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "pdf": "application/pdf",
 }
+
+
+def attendance_enabled() -> bool:
+    raw = os.getenv("ATTENDANCE_ENABLED")
+    if raw is None:
+        return True
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _require_enabled() -> None:
+    if not attendance_enabled():
+        raise HTTPException(status_code=503, detail="Smart Attendance is disabled")
 
 app = FastAPI()
 
@@ -58,6 +71,7 @@ def _ensure_started():
 def cameras():
     """Local camera devices detected on this machine, plus whichever source
     is currently selected (a local index or a network stream URL)."""
+    _require_enabled()
     return {
         "cameras": attendance.list_available_cameras(),
         "current_source": attendance.get_video_source(),
@@ -74,6 +88,7 @@ def set_camera_source(body: CameraSourceRequest):
     local device index ("0", "1", ...) or a network stream URL
     (rtsp://... or http://... from a phone/laptop acting as an IP camera).
     Has no effect on an already-running session."""
+    _require_enabled()
     if _camera_thread is not None and _camera_thread.is_alive():
         raise HTTPException(400, "Stop the current session before changing the camera source.")
     try:
@@ -85,6 +100,7 @@ def set_camera_source(body: CameraSourceRequest):
 
 @app.post("/api/session/start")
 def session_start():
+    _require_enabled()
     _ensure_faces_loaded()
     if not attendance.all_required_persons:
         raise HTTPException(400, "Register at least one person before starting a session.")
@@ -95,6 +111,7 @@ def session_start():
 
 @app.post("/api/session/stop")
 def session_stop():
+    _require_enabled()
     attendance.stop_session()
     attendance.stop_camera_loop()
     # Wait for the camera thread to actually finish (cap.release()) before
@@ -113,6 +130,7 @@ def session_report(format: str = "xlsx"):
     """Build the just-finished session's report in the requested format,
     then wipe all data. Called only once the user confirms via the download
     dialog - nothing is wiped until this actually runs."""
+    _require_enabled()
     if format not in REPORT_MEDIA_TYPES:
         raise HTTPException(400, "format must be 'xlsx' or 'pdf'.")
 
@@ -135,23 +153,27 @@ def wipe_data():
     """Delete all registered people and session history on demand - used by
     the frontend once a processed upload's result/report has been
     downloaded, or the user leaves that view."""
+    _require_enabled()
     attendance.wipe_all_data()
     return attendance.get_status()
 
 
 @app.get("/api/status")
 def status():
+    _require_enabled()
     return attendance.get_status()
 
 
 @app.get("/api/people")
 def people():
+    _require_enabled()
     _ensure_faces_loaded()
     return {"people": attendance.get_registered_people()}
 
 
 @app.post("/api/people/register")
 async def register_person(name: str = Form(...), file: UploadFile = File(...)):
+    _require_enabled()
     content = await file.read()
     try:
         safe_name = attendance.register_person(name, content)
@@ -162,6 +184,7 @@ async def register_person(name: str = Form(...), file: UploadFile = File(...)):
 
 @app.post("/api/process_media")
 async def process_media(file: UploadFile = File(...)):
+    _require_enabled()
     _ensure_faces_loaded()
     if not attendance.all_required_persons:
         raise HTTPException(400, "Register at least one person before uploading media.")
@@ -200,6 +223,7 @@ def media_report(body: MediaReportRequest):
     /api/process_media) rather than caching anything server-side. Does NOT
     wipe - that's still triggered separately by downloading the result/report
     or leaving the media view (see /api/wipe_data)."""
+    _require_enabled()
     if body.format not in REPORT_MEDIA_TYPES:
         raise HTTPException(400, "format must be 'xlsx' or 'pdf'.")
 
@@ -215,6 +239,8 @@ def media_report(body: MediaReportRequest):
 
 @app.get("/api/video_feed")
 async def video_feed(request: Request):
+    _require_enabled()
+
     async def generate():
         try:
             while True:

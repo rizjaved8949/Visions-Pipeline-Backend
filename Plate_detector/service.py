@@ -88,6 +88,15 @@ class ALPRJobService:
             raise KeyError(job_id)
         event.set()
 
+    def stop_all(self) -> None:
+        """Signal every currently-running job to stop - used on app shutdown
+        (Ctrl+C) so a long job doesn't keep a non-daemon worker thread alive
+        long after the user asked the process to exit."""
+        with self._stop_events_lock:
+            events = list(self._stop_events.values())
+        for event in events:
+            event.set()
+
     def _run_job(self, job_id: str, source: str, output_dir: Path, stop_event: threading.Event) -> None:
         try:
             # Import only when inference starts - existing application startup therefore

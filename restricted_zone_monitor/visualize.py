@@ -27,21 +27,29 @@ def draw_zones(img: np.ndarray, zones: ZoneSet, active: set | None = None) -> No
 
 
 def draw_detections(img: np.ndarray, dets: List[Detection], inside_map: Dict[int, List[str]],
-                    anchor: str = "center") -> None:
+                    anchor: str = "center", show_boxes: bool = True, show_labels: bool = True,
+                    show_confidence: bool = True) -> None:
+    """show_boxes/show_labels/show_confidence mirror the workspace-wide
+    Display preferences (Settings page) - read once per session, not per
+    frame, by whoever calls this."""
     for d in dets:
         x1, y1, x2, y2 = map(int, (d.x1, d.y1, d.x2, d.y2))
         breaching = d.track_id in inside_map
         color = (0, 0, 255) if breaching else (0, 200, 0)
-        cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
-        px, py = (d.bottom_center if anchor == "bottom" else d.center)
-        cv2.circle(img, (int(px), int(py)), 5, color, -1)
-        cv2.circle(img, (int(px), int(py)), 8, (255, 255, 255), 1)
-        tag = f"{d.cls_name} #{d.track_id if d.track_id >= 0 else '?'} {d.conf:.2f}"
-        if breaching:
-            tag = "BREACH " + tag
-        (tw, th), _ = cv2.getTextSize(tag, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
-        cv2.rectangle(img, (x1, y1 - th - 8), (x1 + tw + 6, y1), color, -1)
-        cv2.putText(img, tag, (x1 + 3, y1 - 4), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        if show_boxes:
+            cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
+            px, py = (d.bottom_center if anchor == "bottom" else d.center)
+            cv2.circle(img, (int(px), int(py)), 5, color, -1)
+            cv2.circle(img, (int(px), int(py)), 8, (255, 255, 255), 1)
+        if show_labels:
+            tag = f"{d.cls_name} #{d.track_id if d.track_id >= 0 else '?'}"
+            if show_confidence:
+                tag += f" {d.conf:.2f}"
+            if breaching:
+                tag = "BREACH " + tag
+            (tw, th), _ = cv2.getTextSize(tag, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+            cv2.rectangle(img, (x1, y1 - th - 8), (x1 + tw + 6, y1), color, -1)
+            cv2.putText(img, tag, (x1 + 3, y1 - 4), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
 
 class Banner:

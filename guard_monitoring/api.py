@@ -172,6 +172,20 @@ def get_job(job_id: str):
     )
 
 
+@router.post("/jobs/{job_id}/stop")
+def stop_job(job_id: str):
+    """Stop a job still processing early - the annotated video up to that
+    point is still produced and the job still completes normally, just
+    shorter."""
+    _require_enabled()
+    _job_or_404(job_id)
+    try:
+        get_service().request_stop(job_id)
+    except KeyError:
+        raise HTTPException(status_code=409, detail="Job already finished")
+    return {"job_id": job_id, "status": "stopping"}
+
+
 @router.get("/jobs/{job_id}/summary")
 def get_summary(job_id: str):
     _require_enabled()

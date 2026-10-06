@@ -1,3 +1,4 @@
+import os
 import shutil
 import time
 
@@ -52,6 +53,18 @@ from .storage import (
 router = APIRouter()
 
 
+def kitchen_enabled() -> bool:
+    raw = os.getenv("KITCHEN_HYGIENE_ENABLED")
+    if raw is None:
+        return True
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _require_enabled() -> None:
+    if not kitchen_enabled():
+        raise HTTPException(status_code=503, detail="Kitchen Hygiene is disabled")
+
+
 # ============================================================
 # SCHEMAS
 # ============================================================
@@ -104,6 +117,8 @@ def health():
 async def detect_image(
     file: UploadFile = File(...),
 ):
+
+    _require_enabled()
 
     content = await file.read()
 
@@ -217,6 +232,8 @@ async def upload_video(
     ),
 ):
 
+    _require_enabled()
+
     extension = (
         Path(
             file.filename
@@ -294,6 +311,8 @@ def start_camera(
     request: CameraRequest,
 ):
 
+    _require_enabled()
+
     source = request.source
 
 
@@ -342,6 +361,8 @@ def stop_session(
     session_id: str,
 ):
 
+    _require_enabled()
+
     session = STORE.get_session(
         session_id
     )
@@ -380,6 +401,8 @@ def session_status(
     session_id: str,
 ):
 
+    _require_enabled()
+
     session = STORE.get_session(
         session_id
     )
@@ -406,6 +429,8 @@ def session_status(
 def dashboard(
     session_id: str,
 ):
+
+    _require_enabled()
 
     session = STORE.get_session(
         session_id
@@ -512,6 +537,8 @@ def persons(
     session_id: str,
 ):
 
+    _require_enabled()
+
     session = STORE.get_session(
         session_id
     )
@@ -559,6 +586,8 @@ def violations(
     ),
 ):
 
+    _require_enabled()
+
     if STORE.get_session(
         session_id
     ) is None:
@@ -592,6 +621,8 @@ def violations(
 def latest_frame(
     session_id: str,
 ):
+
+    _require_enabled()
 
     session = STORE.get_session(
         session_id
@@ -738,6 +769,8 @@ def stream_current():
     Guard module's /live/current/stream, so the frontend doesn't need a
     session_id in hand before it can start streaming."""
 
+    _require_enabled()
+
     session_id = (
         SERVICE.current_session_id()
     )
@@ -764,6 +797,8 @@ def stream_current():
 def stream(
     session_id: str,
 ):
+
+    _require_enabled()
 
     if STORE.get_session(
         session_id
@@ -793,6 +828,8 @@ def stream(
 def video(
     session_id: str,
 ):
+
+    _require_enabled()
 
     session = STORE.get_session(
         session_id
@@ -851,6 +888,8 @@ def report(
         "pdf"
     ),
 ):
+
+    _require_enabled()
 
     if STORE.get_session(
         session_id

@@ -187,4 +187,19 @@ class KitchenService:
         return True
 
 
+    def stop_all(self):
+        """Signal every currently-running session to stop - used on app
+        shutdown (Ctrl+C) so a long upload job doesn't keep a non-daemon
+        worker thread alive long after the user asked the process to exit."""
+
+        with self.lock:
+
+            events = list(self.stop_events.values())
+
+
+        for event in events:
+
+            event.set()
+
+
 SERVICE = KitchenService()

@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import os
 from typing import List, Optional
 
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
@@ -14,6 +15,18 @@ REPORT_MEDIA_TYPES = {
     "csv": "text/csv",
     "pdf": "application/pdf",
 }
+
+
+def restricted_zone_enabled() -> bool:
+    raw = os.getenv("RESTRICTED_ZONE_ENABLED")
+    if raw is None:
+        return True
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _require_enabled() -> None:
+    if not restricted_zone_enabled():
+        raise HTTPException(status_code=503, detail="Restricted Zone Monitor is disabled")
 
 
 class CameraSourceRequest(BaseModel):
@@ -39,6 +52,7 @@ def cameras():
     """Local camera devices detected on this machine, plus whichever source
     is currently selected (a local index, a network stream URL, or an
     uploaded video file's path)."""
+    _require_enabled()
     return {"cameras": monitor.list_available_cameras(), "current_source": monitor.get_video_source()}
 
 
@@ -46,6 +60,7 @@ def cameras():
 def set_camera_source(body: CameraSourceRequest):
     """Change the source used the NEXT time a session starts. Has no effect
     on an already-running session."""
+    _require_enabled()
     try:
         parsed = monitor.set_video_source(body.source)
     except ValueError as e:
@@ -56,6 +71,7 @@ def set_camera_source(body: CameraSourceRequest):
 @router.post("/upload")
 async def upload_video(file: UploadFile = File(...)):
     """Upload a video file and select it as the source for the next session."""
+    _require_enabled()
     content = await file.read()
     try:
         path = monitor.save_uploaded_video(file.filename, content)
@@ -70,6 +86,7 @@ def zones_frame():
     """A fresh snapshot from the current source for the frontend to draw
     zone polygon(s) on. Call this again for every new file/session - nothing
     about a previous run's zones carries over."""
+    _require_enabled()
     try:
         jpeg, width, height = monitor.get_zone_frame_jpeg()
     except (RuntimeError, FileNotFoundError) as e:
@@ -79,6 +96,7 @@ def zones_frame():
 
 @router.get("/zones")
 def get_zones():
+    _require_enabled()
     return _zone_set_payload(monitor.get_zones())
 
 
@@ -87,6 +105,7 @@ def set_zones(body: ZonesRequest):
     """Set the zone(s) to monitor for the next session. Points are
     normalised 0..1 against the frame returned by GET /zones/frame. Kept in
     memory only - never written to disk, and cleared on wipe."""
+    _require_enabled()
     try:
         zone_set = monitor.set_zones([z.model_dump() for z in body.zones])
     except ValueError as e:
@@ -96,6 +115,7 @@ def set_zones(body: ZonesRequest):
 
 @router.post("/session/start")
 def session_start():
+    _require_enabled()
     try:
         return monitor.start_session()
     except ValueError as e:
@@ -107,6 +127,7 @@ def session_stop():
     """Stop the active session. Data is NOT wiped here - the frontend shows
     a download dialog first, and only /session/report (once confirmed) or
     /wipe_data (if the user declines) actually clears it."""
+    _require_enabled()
     try:
         return monitor.stop_session()
     except ValueError as e:
@@ -118,6 +139,7 @@ def session_report(format: str = "csv"):
     """Build the just-finished session's report in the requested format,
     then wipe all session + zone data. Called once the user confirms via the
     download dialog."""
+    _require_enabled()
     if format not in REPORT_MEDIA_TYPES:
         raise HTTPException(400, "format must be 'csv' or 'pdf'.")
 
@@ -140,12 +162,14 @@ def wipe_data():
     """Discard the finished session's data on demand - used by the frontend
     once a report has been downloaded, or if the user leaves the download
     view without downloading anything."""
+    _require_enabled()
     monitor.wipe_all_data()
     return monitor.get_status()
 
 
 @router.get("/status")
 def status():
+    _require_enabled()
     return monitor.get_status()
 
 
@@ -154,6 +178,7 @@ def session_video():
     """The just-finished session's annotated video - stays available for
     replay until /session/report or /wipe_data clears it, same lifetime as
     the report."""
+    _require_enabled()
     path = monitor.get_session_video_path()
     if path is None:
         raise HTTPException(404, "No processed video available for this session.")
@@ -162,6 +187,8 @@ def session_video():
 
 @router.get("/video_feed")
 async def video_feed(request: Request):
+    _require_enabled()
+
     async def generate():
         try:
             while True:
