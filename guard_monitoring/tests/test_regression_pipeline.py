@@ -94,6 +94,10 @@ class PipelineRegressionTests(unittest.TestCase):
     def setUp(self):
         env={k:v for k,v in os.environ.items() if not k.startswith('GUARD_')}
         with patch.dict(os.environ,env,clear=True): self.cfg=load_config()
+        # These regressions cover the retained timed/held presentation policy.
+        # Current-frame presentation is exercised separately in test_frame_status.
+        self.cfg['activity']['frame_status_enabled']=False
+        self.cfg['sleep_logic']['suppress_when_phone_active']=True
         self.cfg['camera_motion']['enabled']=True
         self.cfg['guard_selection']['confirm_seconds']=0
         self.cfg['movement'].update(minimum_history_seconds=.5,history_seconds=1.5)

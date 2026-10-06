@@ -23,6 +23,7 @@ class PostureAnalyzer:
         self.standing_knee_min = float(cfg.get("standing_knee_angle_min_deg", 155.0))
         self.torso_lean_threshold = float(cfg.get("torso_lean_deg", 28.0))
         self.head_down_ratio = float(cfg.get("head_down_ratio", 0.32))
+        self.head_ear_drop_ratio = float(cfg.get("head_ear_drop_ratio", 0.35))
         # Additive: sitting inferred from bbox shape when knees/ankles are
         # occluded (typical desk/counter scene). See config.py for the
         # sitting/standing aspect-ratio thresholds.
@@ -68,10 +69,24 @@ class PostureAnalyzer:
                 knee_angles.append(right_angle)
 
         posture = "unknown"
-        if knee_angles:
-            if min(knee_angles) <= self.sitting_knee_max:
+        thighs = []
+        for hip, knee, ankle, knee_angle in (
+            (LEFT_HIP, LEFT_KNEE, LEFT_ANKLE, left_angle),
+            (RIGHT_HIP, RIGHT_KNEE, RIGHT_ANKLE, right_angle),
+        ):
+            if all(valid(i) for i in (hip, knee)):
+                thigh = keypoints[knee, :2] - keypoints[hip, :2]
+                length = float(np.linalg.norm(thigh))
+                if length > 5:
+                    thighs.append((float(thigh[1] / length), knee_angle))
+        if thighs:
+            # Walking bends a knee too. Seated posture additionally needs a
+            # near-horizontal thigh; a bent walking leg must not become Sitting.
+            if len(thighs) == 2 and all(
+                    abs(vertical) < .6 and (angle is None or angle <= self.sitting_knee_max)
+                    for vertical, angle in thighs):
                 posture = "sitting"
-            elif min(knee_angles) >= self.standing_knee_min:
+            elif all(vertical >= .75 for vertical, _ in thighs):
                 posture = "standing"
 
         torso_lean = None
@@ -94,6 +109,21 @@ class PostureAnalyzer:
                 head_clearance = float(shoulder_center[1] - nose_y)
                 ratio = head_clearance / torso_len
                 head_down = ratio < self.head_down_ratio
+
+        # A close-up often hides both hips. Independently estimate head drop
+        # from high-confidence nose/eye/ear landmarks; leave body labels alone.
+        if not head_down_known and keypoints[NOSE, 2] >= max(self.kp_conf, 0.7):
+            drops = []
+            for eye_idx, ear_idx in ((1, 3), (2, 4)):
+                if min(keypoints[eye_idx, 2], keypoints[ear_idx, 2]) >= max(self.kp_conf, 0.7):
+                    distance = float(np.linalg.norm(keypoints[NOSE, :2] - keypoints[ear_idx, :2]))
+                    if distance > 5:
+                        drops.append((keypoints[NOSE, 1] - keypoints[ear_idx, 1]) / distance)
+            if drops:
+                head_down_known = True
+                # If both ears are visible, require agreement to avoid treating
+                # a sideways roll alone as downward head pitch.
+                head_down = bool(min(drops) >= self.head_ear_drop_ratio)
 
         posture_source = "keypoints" if posture != "unknown" else "unknown"
         # Occlusion fallback: use bbox aspect only when the knee-angle

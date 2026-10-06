@@ -8,16 +8,15 @@ import json
 from pathlib import Path
 
 from guard_monitoring.diagnostics import BUILD_ID
-from guard_monitoring.monitoring.activity import ActivityStabilizer
 from guard_monitoring.monitoring.rules import TimedRuleEngine
-from guard_monitoring.monitoring.sleep import SleepAnalyzer
+from guard_monitoring.monitoring.sleep import SleepAnalyzer, SleepStatusStabilizer
 from guard_monitoring.types import EyeState, MovementState, PhoneState, PostureState
 
 
 def replay():
     path=Path(__file__).resolve().parents[1]/'tests/fixtures/sleep_eye_evidence.json'
     fixture=json.loads(path.read_text(encoding='utf-8'))
-    analyzer=SleepAnalyzer({});activity=ActivityStabilizer({})
+    analyzer=SleepAnalyzer({});display=SleepStatusStabilizer({})
     # Explicit replay settings; never read/modify the deployment's environment.
     rule_cfg=dict(warmup_seconds=0,sleep_seconds=5,phone_seconds=5,
                   stationary_seconds=8,absence_seconds=5,
@@ -32,7 +31,8 @@ def replay():
         condition=True if state.candidate else False if state.evidence_quality=='high' else None
         event=rules.update('sleep',condition,t,r['guard_track_id'],{})
         if event:events.append(event.to_dict())
-        shown=activity.update('Sleeping' if state.candidate else None,t,present=True)
+        shown=display.update(state,t,track_id=r['guard_track_id'],present=True,
+                             observed_at=r['eyes'].get('observed_at'))
         decisions.append(dict(time_seconds=t,candidate=state.candidate,label=shown['label'],
                               reason=state.reason,basis=state.decision_basis,
                               eye_seconds=state.eye_evidence_seconds,perclos=state.perclos,

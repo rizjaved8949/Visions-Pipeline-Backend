@@ -28,6 +28,7 @@ class MediaPipeEyeAnalyzer:
         min_eye_width_pixels: int = 4,
         min_eye_symmetry_ratio: float = 0.30,
         face_landmarker_model: str = "",
+        max_eye_yaw_degrees: float = 45.0,
     ):
         import mediapipe as mp
 
@@ -36,6 +37,7 @@ class MediaPipeEyeAnalyzer:
         self.min_face_pixels = int(min_face_pixels)
         self.min_eye_width_pixels = int(min_eye_width_pixels)
         self.min_eye_symmetry_ratio = float(min_eye_symmetry_ratio)
+        self.max_eye_yaw_degrees = float(max_eye_yaw_degrees)
         self.backend = None
         self.face_mesh = None
         self.landmarker = None
@@ -115,15 +117,27 @@ class MediaPipeEyeAnalyzer:
         ear_mean = (ear_left + ear_right) / 2.0
         delta = right.mean(axis=0) - left.mean(axis=0)
         head_roll = (float(np.degrees(np.arctan2(delta[1], delta[0]))) + 90.0) % 180.0 - 90.0
+        # Face Mesh depth uses the same scale as normalized x. A near-profile
+        # face can have plausible 2-D widths but unreliable eyelid geometry.
+        depth_delta = (np.mean([landmarks[i].z for i in RIGHT_EYE])
+                       - np.mean([landmarks[i].z for i in LEFT_EYE])) * cw
+        yaw = float(np.degrees(np.arctan2(abs(depth_delta), np.linalg.norm(delta))))
+        quality_ok = yaw <= self.max_eye_yaw_degrees
+        face_vertical = np.array([(landmarks[152].x - landmarks[10].x) * cw,
+                                  (landmarks[152].y - landmarks[10].y) * ch])
+        pitch = float(np.degrees(np.arctan2((landmarks[152].z - landmarks[10].z) * cw,
+                                           np.linalg.norm(face_vertical))))
         return EyeState(
             available=True,
-            quality_ok=True,
-            eyes_closed=bool(ear_mean < self.ear_closed_threshold),
+            quality_ok=quality_ok,
+            eyes_closed=bool(ear_mean < self.ear_closed_threshold) if quality_ok else None,
             ear_left=ear_left,
             ear_right=ear_right,
             ear_mean=ear_mean,
-            reason="ok",
+            reason="ok" if quality_ok else "extreme_side_view_or_occlusion",
             head_roll_degrees=head_roll,
+            head_yaw_degrees=yaw,
+            head_pitch_degrees=pitch,
         )
 
     def _landmarks(self, rgb, timestamp_ms: int):

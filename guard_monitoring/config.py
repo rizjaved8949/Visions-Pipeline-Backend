@@ -126,11 +126,12 @@ def load_config(
                 "ear_closed_threshold": _float("GUARD_EAR_CLOSED_THRESHOLD", 0.20),
                 "min_eye_width_pixels": _int("GUARD_MIN_EYE_WIDTH_PIXELS", 4),
                 "min_eye_symmetry_ratio": _float("GUARD_MIN_EYE_SYMMETRY_RATIO", 0.30),
+                "max_eye_yaw_degrees": _float("GUARD_MAX_EYE_YAW_DEGREES", 45.0),
             },
         },
         "tracker": {
             "lost_track_buffer": _int("GUARD_TRACK_LOST_BUFFER", 120),
-            "minimum_consecutive_frames": _int("GUARD_TRACK_MIN_CONSECUTIVE", 2),
+            "minimum_consecutive_frames": _int("GUARD_TRACK_MIN_CONSECUTIVE", 1),
             "track_activation_threshold": _float("GUARD_TRACK_ACTIVATION_THRESHOLD", 0.45),
             "high_conf_det_threshold": _float("GUARD_TRACK_HIGH_CONF_THRESHOLD", 0.35),
             "minimum_iou_threshold": _float("GUARD_TRACK_MIN_IOU", 0.10),
@@ -142,7 +143,7 @@ def load_config(
         },
         "guard_selection": {
             "duty_zone": duty_zone,
-            "confirm_seconds": _float("GUARD_SELECTION_CONFIRM_SECONDS", 1.0),
+            "confirm_seconds": _float("GUARD_SELECTION_CONFIRM_SECONDS", 0.0),
             "release_seconds": _float("GUARD_SELECTION_RELEASE_SECONDS", 5.0),
             "presence_grace_seconds": _float("GUARD_PRESENCE_GRACE_SECONDS", 2.0),
             "manual_track_id": None,
@@ -181,6 +182,9 @@ def load_config(
             "history_seconds": _float("GUARD_MOVEMENT_HISTORY_SECONDS", 5.0),
             "stationary_radius_ratio": _float("GUARD_STATIONARY_RADIUS_RATIO", 0.035),
             "minimum_history_seconds": _float("GUARD_MOVEMENT_MIN_HISTORY_SECONDS", 2.0),
+            "frame_min_motion_pixels": _float("GUARD_FRAME_MIN_MOTION_PIXELS", 2.0),
+            "frame_speed_ratio": _float("GUARD_FRAME_SPEED_RATIO", 0.06),
+            "frame_joint_change_ratio": _float("GUARD_FRAME_JOINT_CHANGE_RATIO", 0.012),
             "patrol_zones": patrol_zones,
             "border_margin_ratio": _float("GUARD_MOVEMENT_BORDER_MARGIN", 0.015),
             "max_box_scale_change": _float("GUARD_MOVEMENT_MAX_BOX_SCALE_CHANGE", 0.25),
@@ -203,6 +207,7 @@ def load_config(
             "standing_knee_angle_min_deg": _float("GUARD_STANDING_KNEE_MIN_DEG", 155.0),
             "torso_lean_deg": _float("GUARD_TORSO_LEAN_DEG", 28.0),
             "head_down_ratio": _float("GUARD_HEAD_DOWN_RATIO", 0.32),
+            "head_ear_drop_ratio": _float("GUARD_HEAD_EAR_DROP_RATIO", 0.35),
             # Additive: when knees/ankles are invalid (typical desk/counter
             # occlusion) infer 'sitting' from a short/wide bbox aspect ratio.
             # A cleanly standing person's bbox is ~2.5:1 tall; sitting behind
@@ -229,7 +234,7 @@ def load_config(
             "perclos_window_seconds": _float("GUARD_PERCLOS_WINDOW_SECONDS", 30.0),
             "perclos_threshold": _float("GUARD_PERCLOS_THRESHOLD", 0.60),
             "sleep_score_threshold": _float("GUARD_SLEEP_SCORE_THRESHOLD", 0.45),
-            "suppress_when_phone_active": _bool("GUARD_SLEEP_SUPPRESS_PHONE", True),
+            "suppress_when_phone_active": _bool("GUARD_SLEEP_SUPPRESS_PHONE", False),
             "allow_degraded_rule_trigger": _bool("GUARD_ALLOW_DEGRADED_SLEEP_ALERT", False),
             "min_eye_evidence_seconds": _float("GUARD_MIN_EYE_EVIDENCE_SECONDS", 2.0),
             "min_closed_seconds": _float("GUARD_MIN_CLOSED_SECONDS", 2.0),
@@ -242,6 +247,14 @@ def load_config(
             "eye_only_perclos_threshold": _float("GUARD_EYE_ONLY_PERCLOS", max(.85, _float("GUARD_PERCLOS_THRESHOLD", .60))),
             "eye_only_min_coverage": _float("GUARD_EYE_ONLY_MIN_COVERAGE", max(.75, _float("GUARD_MIN_EYE_COVERAGE", .60))),
             "head_roll_threshold": _float("GUARD_SLEEP_HEAD_ROLL_DEGREES", 15.0),
+            "ear_closed_threshold": _float("GUARD_EAR_CLOSED_THRESHOLD", 0.20),
+            "ear_open_threshold": _float("GUARD_SLEEP_EAR_OPEN_THRESHOLD", max(
+                0.23, _float("GUARD_EAR_CLOSED_THRESHOLD", 0.20))),
+            "ear_smoothing_seconds": _float("GUARD_SLEEP_EAR_SMOOTHING_SECONDS", 0.15),
+            "fallback_gap_seconds": _float("GUARD_SLEEP_FALLBACK_GAP_SECONDS", 0.5),
+            "display_hold_seconds": _float("GUARD_SLEEP_DISPLAY_HOLD_SECONDS", 1.0),
+            "posture_display_hold_seconds": _float("GUARD_SLEEP_POSTURE_HOLD_SECONDS", 3.0),
+            "wake_confirm_seconds": _float("GUARD_SLEEP_WAKE_CONFIRM_SECONDS", 0.8),
             "max_gap_seconds": _float("GUARD_MAX_EVIDENCE_GAP_SECONDS", 2.0),
         },
         "rules": {
@@ -260,6 +273,7 @@ def load_config(
             },
         },
         "activity": {
+            "frame_status_enabled": _bool("GUARD_FRAME_STATUS_ENABLED", True),
             "confirm_seconds": _float("GUARD_ACTIVITY_CONFIRM_SECONDS", 0.4),
             "sleep_confirm_seconds": _float("GUARD_ACTIVITY_SLEEP_CONFIRM_SECONDS", 0.4),
             "hold_seconds": _float("GUARD_ACTIVITY_HOLD_SECONDS", 1.0),
@@ -310,6 +324,10 @@ def load_config(
     }
 
     if _bool("GUARD_TEST_MODE", False):
+        # Short clips can exercise posture fallback without changing production
+        # thresholds or an explicitly supplied fallback duration.
+        cfg["sleep_logic"]["fallback_confirm_seconds"] = _float(
+            "GUARD_SLEEP_FALLBACK_SECONDS", _float("GUARD_TEST_SLEEP_FALLBACK_SECONDS", 4.0))
         cfg["rules"].update(
             sleep_seconds=_float("GUARD_TEST_SLEEP_SECONDS", 5.0),
             phone_seconds=_float("GUARD_TEST_PHONE_SECONDS", 5.0),
@@ -346,6 +364,16 @@ def validate_config(cfg: dict[str, Any]) -> None:
         if not 0 < float(section[key]) <= 1:
             raise ValueError(f"{key} must be in (0, 1]")
     sleep = cfg["sleep_logic"]
+    if not 0 < cfg["models"]["eyes"]["max_eye_yaw_degrees"] <= 90:
+        raise ValueError("Eye yaw limit must be in (0, 90]")
+    if not 0 < cfg["pose_logic"]["head_ear_drop_ratio"] <= 1:
+        raise ValueError("Head/ear drop ratio must be in (0, 1]")
+    if not 0 < sleep["ear_closed_threshold"] <= sleep["ear_open_threshold"] <= 1:
+        raise ValueError("Sleep EAR thresholds must satisfy 0 < closed <= open <= 1")
+    if sleep["wake_confirm_seconds"] > sleep["display_hold_seconds"]:
+        raise ValueError("Sleep wake confirmation must not exceed display hold")
+    if sleep["display_hold_seconds"] > cfg["guard_selection"]["presence_grace_seconds"]:
+        raise ValueError("Sleep display hold must not exceed presence grace")
     if (sleep["eye_only_min_seconds"] < max(sleep["min_eye_evidence_seconds"], sleep["min_closed_seconds"])
             or sleep["eye_only_perclos_threshold"] < sleep["perclos_threshold"]
             or sleep["eye_only_min_coverage"] < sleep["min_eye_coverage"]):

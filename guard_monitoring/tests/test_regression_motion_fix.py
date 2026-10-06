@@ -48,8 +48,9 @@ class IndependentEyeTests(unittest.TestCase):
         self.assertFalse(any(s.candidate for s in self.sequence(movement=MovementState(reliable=True,stationary=False))))
 
     def test_phone_active_still_vetoes_closed_eyes(self):
+        cfg=clean_config()['sleep_logic'];cfg['suppress_when_phone_active']=True
         for usage in ('call','screen_use','visible'):
-            self.assertFalse(any(s.candidate for s in self.sequence(phone=PhoneState(detected=True,usage=usage))))
+            self.assertFalse(any(s.candidate for s in self.sequence(phone=PhoneState(detected=True,usage=usage),cfg=cfg)))
 
     def test_missing_phone_blocks_independent_eye_route(self):
         states=self.sequence(available=dict(movement=True,eyes=True,posture=True,phone=False))

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-ACTIVITY_LABELS = frozenset({"Sleeping", "Moving", "Using Mobile", "Stationary"})
+ACTIVITY_LABELS = frozenset({"Sleeping", "Moving", "Using Mobile", "Stationary", "Sitting", "Standing"})
 
 
 class ActivityStabilizer:

@@ -55,6 +55,8 @@ class EyeState:
     reason: str = "not_run"
     observed_at: Optional[float] = None
     head_roll_degrees: Optional[float] = None
+    head_yaw_degrees: Optional[float] = None
+    head_pitch_degrees: Optional[float] = None
 
 
 @dataclass
@@ -97,6 +99,9 @@ class SleepState:
     eye_coverage: float = 0.0
     continuous_closed_seconds: float = 0.0
     decision_basis: str = "unknown"
+    filtered_ear: Optional[float] = None
+    filtered_eyes_closed: Optional[bool] = None
+    posture_support: bool = False
 
 
 @dataclass

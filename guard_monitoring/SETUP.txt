@@ -28,3 +28,65 @@ GUARD MONITORING - EXACT LOCAL SETUP
 
 The guard API is registered inside app.py at /api/guard/*.
 The existing launcher app.py is not turned into a second FastAPI application.
+
+CURRENT-FRAME GUARD STATUSES
+
+The six primary labels are Sleeping, Using Mobile, Moving, Stationary, Sitting,
+and Standing. Guard presence is separate. Motion and posture are separate:
+Sitting must not replace Moving, and Stationary can appear together with Sitting.
+Phone Visible describes a held phone without asserting current phone use.
+Possible Sleep and Status Unknown explicitly identify insufficient evidence.
+
+GUARD_FRAME_STATUS_ENABLED=true is the default. In this mode:
+- Every decoded uploaded-video frame is processed. Pose, phone, and eye
+  inference run on each analyzable guard frame; sensor strides are forced to 1.
+  Video timestamps govern all measurements. Processing speed depends on the
+  hardware; immediate frame labels do not guarantee real-time CPU inference.
+- The overlay and API activity use current observations without presentation
+  confirmation or hold timers. Movement starts/stops on consecutive observed
+  frames. A first frame alone cannot establish motion.
+- Background-compensated body motion and shoulder-relative articulation supply
+  motion evidence. Unresolved camera motion is not proof of stationarity.
+- Closed eyes with head/body sleep posture (including backward/sideward head
+  inclination) can show Sleeping immediately. Fresh open eyes clear it on that
+  frame. A closed-eye observation without supporting posture shows Possible Sleep.
+  These frame classifications are visual estimates, not guarantees that a blink
+  or an occluded face can always be distinguished from sleep.
+- Holding a phone no longer vetoes sleep. Sleeping + Phone Visible can coexist.
+  Looking down at an actively used phone with unavailable eyes does not imply sleep.
+- Sitting needs leg geometry, including hip/knee evidence when ankles are cropped.
+  A bent walking knee and a short/wide detector box are not enough for Sitting.
+  Hidden legs do not produce an invented Sitting/Standing label.
+- Brief missed guard detections still run fresh sensors in the bounded retained
+  guard region. A matching high-confidence pose must verify current body presence
+  before statuses are shown. These recoveries do not count as detections or as
+  verified positive alert time. Unverified retained tracks show Status Unknown.
+
+Alert timers remain separate: duration-based sleep alerts still need sustained
+evidence and production/test thresholds. GUARD_SLEEP_SUPPRESS_PHONE=false is the
+new default; true explicitly restores the old phone veto for timed sleep evidence.
+Posture-only alerts remain disabled unless GUARD_ALLOW_DEGRADED_SLEEP_ALERT=true.
+
+GUARD_FRAME_STATUS_ENABLED=false restores the older debounced presentation policy.
+GUARD_ACTIVITY_* and GUARD_SLEEP_*_HOLD_SECONDS apply to that policy, not immediate
+frame overlays. GUARD_PERCLOS_WINDOW_SECONDS is the supported history-window key.
+
+frames.jsonl includes display_statuses, frame_movement, sleep_display, and
+status_observed_now. summary.json reports primary_status_classes and per-label
+display_status_counts. Original detector presence remains guard_seen_now.
+
+Run status and compatibility regressions:
+  python -m pytest guard_monitoring/tests -q -k "not test_original_persistent_storage_test"
+The excluded pre-existing test has a Windows SQLite cleanup lock failure.
+
+Run every frame of an original video into a new output directory:
+  python -m guard_monitoring.scripts.run_guard_video --source "D:/Videos/guard_test.mp4" --output "local_data/guard/outputs/status-check" --test-mode
+
+For faster status tuning after a full detector run, run_recorded_guard_video
+reuses recorded guard/camera observations while re-running fresh pose, phone,
+eyes, motion, statuses, and alert rules through the real pipeline. Its summary
+explicitly marks that validation scope and verifies decoded output frame count.
+
+Restart the backend after changing Python code or .env. Existing workers retain
+the imported implementation until restarted. Use original videos for clean QA;
+old rendered labels in an annotated input can contaminate visual inspection.

@@ -4,7 +4,7 @@ from copy import deepcopy
 from importlib.metadata import PackageNotFoundError, version
 import platform
 
-BUILD_ID = 'guard-motion-sleep-fix-2026-09-24'
+BUILD_ID = 'guard-frame-status-v2-2026-10-06'
 
 
 def effective_config(cfg):

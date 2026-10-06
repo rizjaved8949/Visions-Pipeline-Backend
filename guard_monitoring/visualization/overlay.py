@@ -27,9 +27,13 @@ COCO_EDGES = [
 _STATUS_COLORS = {
     "Using Mobile": (0, 200, 255),   # amber
     "Sleeping":     (0, 80, 255),    # red
+    "Possible Sleep": (0, 180, 255), # posture evidence, eyes unavailable
     "Moving":       (50, 220, 50),   # green
     "Stationary":   (220, 220, 220), # white
     "Sitting":      (255, 180, 50),  # blue-ish
+    "Standing":     (255, 210, 120),
+    "Phone Visible": (0, 200, 255),
+    "Status Unknown": (170, 170, 170),
 }
 
 

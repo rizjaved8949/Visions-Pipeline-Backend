@@ -210,6 +210,7 @@ class LazyModelRegistry:
                 min_eye_width_pixels=cfg.get("min_eye_width_pixels", 4),
                 min_eye_symmetry_ratio=cfg.get("min_eye_symmetry_ratio", 0.30),
                 face_landmarker_model=cfg.get("face_landmarker_model", ""),
+                max_eye_yaw_degrees=cfg.get("max_eye_yaw_degrees", 45.0),
             )
 
         return self._get("eyes", build, enabled)

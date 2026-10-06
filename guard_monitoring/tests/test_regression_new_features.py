@@ -412,6 +412,7 @@ class ActivityMappingTests(unittest.TestCase):
         for name in ("pose", "phone", "eyes"):
             cfg["models"][name]["every_n_frames"] = 1
         cfg["activity"]["mapping_mode"] = "evidence"
+        cfg["activity"]["frame_status_enabled"] = False
         return cfg
 
     def _pipeline_and_registry(self, cfg):

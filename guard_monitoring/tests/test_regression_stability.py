@@ -242,7 +242,8 @@ class MovementRegressionTests(unittest.TestCase):
 class SleepRegressionTests(unittest.TestCase):
     def run_sequence(self, *, closed=None, head_down=False, phone=None, duration=10,
                      movement=True, available=None, cached=False):
-        analyzer=SleepAnalyzer(clean_config()['sleep_logic'])
+        cfg=clean_config()['sleep_logic'];cfg['suppress_when_phone_active']=True
+        analyzer=SleepAnalyzer(cfg)
         states=[]
         for i in range(round(duration*10)+1):
             t=i*.1
