@@ -33,7 +33,7 @@ for directory in [
 
 
 # ============================================================
-# TRAINED PPE MODEL
+# TRAINED PPE MODEL  (mask / gloves / hairnet — 7 classes)
 # ============================================================
 
 PPE_MODEL_PATH = (
@@ -43,14 +43,21 @@ PPE_MODEL_PATH = (
 
 
 # ============================================================
-# PERSON DETECTOR
+# APRON MODEL  (apron / no_apron — 2 classes)
+# Download apron_detector_best.pt from Kaggle and place it here.
+# If the file is absent the pipeline falls back gracefully:
+# apron status is reported as "unsupported" instead of
+# raising an error, so the rest of the pipeline keeps running.
 # ============================================================
-#
-# If yolov8n.pt is placed in weights/, it will use the local
-# file. Otherwise Ultralytics will try to obtain yolov8n.pt.
-#
-# Production recommendation:
-# keep yolov8n.pt locally after first successful test.
+
+APRON_MODEL_PATH = (
+    WEIGHTS_DIR /
+    "apron_detector_best.pt"
+)
+
+
+# ============================================================
+# PERSON DETECTOR
 # ============================================================
 
 LOCAL_PERSON_MODEL = (
@@ -88,12 +95,27 @@ PPE_IOU = 0.50
 
 
 # ============================================================
+# APRON MODEL SETTINGS
+# Tune APRON_CONFIDENCE to the value recommended in
+# apron_model_metadata.json (threshold_analysis output).
+# ============================================================
+
+APRON_IMAGE_SIZE = 640
+
+APRON_CONFIDENCE = 0.25
+
+APRON_IOU = 0.50
+
+
+# ============================================================
 # PERSON MODEL SETTINGS
 # ============================================================
 
 PERSON_IMAGE_SIZE = 640
 
-PERSON_CONFIDENCE = 0.35
+PERSON_CONFIDENCE = 0.10
+
+PERSON_TRACKER_PATH = PACKAGE_DIR / "person_tracker.yaml"
 
 PERSON_IOU = 0.50
 
@@ -118,7 +140,6 @@ METRIC_SAMPLE_SECONDS = 5.0
 
 
 # One inference worker initially.
-# Increase only after GPU memory/concurrency testing.
 MAX_WORKERS = 1
 
 
@@ -136,18 +157,20 @@ EXPECTED_CLASSES = {
     6: "no_mask",
 }
 
+EXPECTED_APRON_CLASSES = {
+    0: "apron",
+    1: "no_apron",
+}
+
 
 # ============================================================
 # DEFAULT BUSINESS SEVERITY
 # ============================================================
-#
-# These are NOT learned by YOLO.
-# Change them if your SOP policy differs.
-# ============================================================
 
 SEVERITY_MAP = {
-    "no_glove": "critical",
-    "no_mask": "warning",
+    "no_glove"      : "critical",
+    "no_mask"       : "warning",
     "incorrect_mask": "warning",
-    "no_hairnet": "warning",
+    "no_hairnet"    : "warning",
+    "no_apron"      : "warning",
 }

@@ -18,6 +18,7 @@ from .config import (
     DEVICE,
     PERSON_IMAGE_SIZE,
     PERSON_CONFIDENCE,
+    PERSON_TRACKER_PATH,
     PERSON_IOU,
     TEMPORAL_WINDOW,
     TEMPORAL_MIN_VOTES,
@@ -29,6 +30,8 @@ from .config import (
 )
 
 from .model_registry import MODELS
+from .visualization import annotate_people, annotation_size
+from .tracking import distinct_person_indices
 
 from .storage import (
     STORE,
@@ -90,13 +93,34 @@ PPE_RULES = {
             "violation",
             "incorrect_mask",
         ),
+
+    # ---- apron classes (from separate apron model)
+    "apron":
+        (
+            "apron",
+            "compliant",
+            "apron",
+        ),
+
+    "no_apron":
+        (
+            "apron",
+            "violation",
+            "no_apron",
+        ),
 }
 
 
+# Requirements that are always tracked.
+# "apron" is included here; when the apron model weight file is
+# absent, every frame emits state="unknown" for it so the
+# compliance score is unaffected (unknown frames are excluded
+# from the percentage calculation).
 REQUIREMENTS = [
     "mask",
     "gloves",
     "hair_cover",
+    "apron",
 ]
 
 
@@ -447,13 +471,7 @@ class KitchenPipeline:
 
         self.track_last_seen = {}
 
-        # Cumulative, session-wide per-requirement frame tallies. _summary()
-        # used to compute the "compliance by requirement" breakdown purely
-        # from the *current* frame's tracked persons, which meant it briefly
-        # reverted to "no data" every time temporal smoothing re-evaluated a
-        # track (or a track was lost/reacquired) even though real violations
-        # had already been confirmed and logged. Tallying every frame here
-        # instead gives a stable, session-long view.
+        # Cumulative, session-wide per-requirement frame tallies.
         self.requirement_frame_counts = {
             requirement: {
                 "compliant": 0,
@@ -530,7 +548,7 @@ class KitchenPipeline:
                 conf=PERSON_CONFIDENCE,
                 iou=PERSON_IOU,
                 imgsz=PERSON_IMAGE_SIZE,
-                tracker="bytetrack.yaml",
+                tracker=str(PERSON_TRACKER_PATH),
                 device=DEVICE,
                 verbose=False,
             )[0]
@@ -545,9 +563,7 @@ class KitchenPipeline:
             return people
 
 
-        for index, box in enumerate(
-            result.boxes
-        ):
+        for box in result.boxes:
 
             bbox = _extract_xyxy(
                 box
@@ -565,11 +581,9 @@ class KitchenPipeline:
 
             else:
 
-                # Fallback only if ByteTrack has not yet
-                # assigned an ID.
-                track_id = (
-                    100000 + index
-                )
+                # Detection order is not a stable person identity.
+                # Wait for the tracker to confirm an ID.
+                continue
 
 
             confidence = float(
@@ -602,11 +616,12 @@ class KitchenPipeline:
             )
 
 
-        return people
+        kept = distinct_person_indices([person["bbox"] for person in people])
+        return [people[index] for index in kept]
 
 
     # --------------------------------------------------------
-    # PPE detection
+    # PPE detection  (mask / gloves / hairnet model)
     # --------------------------------------------------------
 
     def _ppe(
@@ -670,6 +685,91 @@ class KitchenPipeline:
                         _extract_xyxy(
                             box
                         ),
+
+                    "source":
+                        "ppe_model",
+                }
+            )
+
+
+        return detections
+
+
+    # --------------------------------------------------------
+    # Apron detection  (separate apron model)
+    # --------------------------------------------------------
+
+    def _apron(
+        self,
+        frame,
+    ):
+        """
+        Runs the apron model and returns detections in the same
+        format as _ppe() so they can be merged into one list
+        before association.
+
+        Returns an empty list when the apron model is not
+        available (weight file absent) — the pipeline continues
+        normally and apron status stays "unknown".
+        """
+
+        result = MODELS.predict_apron(
+            frame
+        )
+
+        detections = []
+
+        # predict_apron() returns None when model file is absent.
+        if result is None or result.boxes is None:
+            return detections
+
+
+        for box in result.boxes:
+
+            class_id = int(
+                box.cls[0]
+                .detach()
+                .cpu()
+                .item()
+            )
+
+
+            class_name = str(
+                result.names[
+                    class_id
+                ]
+            )
+
+
+            confidence = float(
+                box.conf[0]
+                .detach()
+                .cpu()
+                .item()
+            )
+
+
+            detections.append(
+                {
+                    "class_id":
+                        class_id,
+
+                    "class_name":
+                        class_name,
+
+                    "confidence":
+                        round(
+                            confidence,
+                            4,
+                        ),
+
+                    "bbox":
+                        _extract_xyxy(
+                            box
+                        ),
+
+                    "source":
+                        "apron_model",
                 }
             )
 
@@ -718,23 +818,12 @@ class KitchenPipeline:
             ]
 
 
-            if not candidates:
-
+            # Overlapping boxes do not establish which person owns PPE.
+            # Leave ambiguous evidence unassigned instead of guessing.
+            if len(candidates) != 1:
                 continue
 
-
-            # In overlapping people, choose smallest
-            # containing person bbox.
-            person = min(
-                candidates,
-                key=lambda item:
-                    _bbox_area(
-                        item[
-                            "bbox"
-                        ]
-                    ),
-            )
-
+            person = candidates[0]
 
             assigned[
                 person[
@@ -905,6 +994,17 @@ class KitchenPipeline:
         result = {
             **person,
 
+            # Display actual class evidence without changing compliance voting.
+            "detected_classes": [
+                {
+                    "class_name": item["evidence_type"],
+                    "confidence": item["confidence"],
+                }
+                for item in raw.values()
+                if item["state"] != "unknown"
+                and item["evidence_type"] in PPE_RULES
+            ],
+
             "mask":
                 stable[
                     "mask"
@@ -918,6 +1018,11 @@ class KitchenPipeline:
             "hair_cover":
                 stable[
                     "hair_cover"
+                ],
+
+            "apron":
+                stable[
+                    "apron"
                 ],
 
             "overall":
@@ -1039,8 +1144,6 @@ class KitchenPipeline:
         )
 
 
-        # "Open violations" is deliberately about right now, from the
-        # current persons snapshot (matches its "needs supervisor" framing).
         open_violations = sum(
             1
             for person in persons
@@ -1049,13 +1152,6 @@ class KitchenPipeline:
         )
 
 
-        # "Compliance by requirement" and the overall score, on the other
-        # hand, use the session-wide cumulative tallies (self.requirement_
-        # frame_counts, updated every frame in process_frame) rather than
-        # just this instant's persons - otherwise a track reset or a brief
-        # temporal-smoothing gap makes an already-confirmed violation revert
-        # to "no data yet" even though it's still sitting in the violations
-        # log.
         requirements = {}
 
         known = 0
@@ -1102,13 +1198,19 @@ class KitchenPipeline:
                 else None
             )
 
+            # Apron is "supported" only when the model weight is present.
+            is_supported = (
+                True
+                if requirement != "apron"
+                else MODELS.apron_model_available()
+            )
 
             requirements[
                 requirement
             ] = {
 
                 "supported":
-                    True,
+                    is_supported,
 
                 "compliant":
                     compliant_count,
@@ -1126,6 +1228,9 @@ class KitchenPipeline:
                     percentage,
             }
 
+            if not is_supported:
+                requirements[requirement]["status"] = "model_not_loaded"
+
 
         score = (
             round(
@@ -1141,15 +1246,6 @@ class KitchenPipeline:
             if known
             else None
         )
-
-
-        # Your current trained model has no apron class.
-        requirements[
-            "apron"
-        ] = {
-            "supported": False,
-            "status": "unavailable",
-        }
 
 
         return {
@@ -1185,196 +1281,16 @@ class KitchenPipeline:
         ppe,
     ):
 
-        output = frame.copy()
-
-
-        # PPE detections
-        for detection in ppe:
-
-            x1, y1, x2, y2 = [
-                int(v)
-                for v in detection[
-                    "bbox"
-                ]
-            ]
-
-
-            if self.show_detection_boxes:
-                cv2.rectangle(
-                    output,
-                    (
-                        x1,
-                        y1,
-                    ),
-                    (
-                        x2,
-                        y2,
-                    ),
-                    (
-                        230,
-                        180,
-                        50,
-                    ),
-                    1,
-                )
-
-
-            if self.show_labels:
-                text = detection['class_name']
-                if self.show_confidence:
-                    text += f" {detection['confidence']:.2f}"
-
-                cv2.putText(
-                    output,
-                    text,
-                    (
-                        x1,
-                        max(
-                            18,
-                            y1 - 5,
-                        ),
-                    ),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.42,
-                    (
-                        230,
-                        180,
-                        50,
-                    ),
-                    1,
-                    cv2.LINE_AA,
-                )
-
-
-        # Person states
-        for person in persons:
-
-            x1, y1, x2, y2 = [
-                int(v)
-                for v in person[
-                    "bbox"
-                ]
-            ]
-
-
-            overall = person[
-                "overall"
-            ]
-
-
-            if overall == "compliant":
-
-                color = (
-                    70,
-                    180,
-                    70,
-                )
-
-            elif overall == "violation":
-
-                color = (
-                    50,
-                    50,
-                    230,
-                )
-
-            else:
-
-                color = (
-                    0,
-                    180,
-                    230,
-                )
-
-
-            if self.show_detection_boxes:
-                cv2.rectangle(
-                    output,
-                    (
-                        x1,
-                        y1,
-                    ),
-                    (
-                        x2,
-                        y2,
-                    ),
-                    color,
-                    2,
-                )
-
-
-            if self.show_labels:
-                label = (
-                    f"{person['staff_label']} "
-                    f"- {overall.upper()}"
-                )
-
-
-                cv2.putText(
-                    output,
-                    label,
-                    (
-                        x1,
-                        max(
-                            22,
-                            y1 - 26,
-                        ),
-                    ),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.55,
-                    color,
-                    2,
-                    cv2.LINE_AA,
-                )
-
-
-                def symbol(
-                    requirement,
-                ):
-
-                    state = (
-                        person[
-                            requirement
-                        ][
-                            "state"
-                        ]
-                    )
-
-                    if state == "compliant":
-                        return "OK"
-
-                    if state == "violation":
-                        return "NO"
-
-                    return "?"
-
-
-                details = (
-                    f"M:{symbol('mask')} "
-                    f"G:{symbol('gloves')} "
-                    f"H:{symbol('hair_cover')}"
-                )
-
-
-                cv2.putText(
-                    output,
-                    details,
-                    (
-                        x1,
-                        max(
-                            42,
-                            y1 - 7,
-                        ),
-                    ),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.45,
-                    color,
-                    1,
-                    cv2.LINE_AA,
-                )
-
-
-        return output
+        return annotate_people(
+            frame,
+            persons,
+            ppe,
+            show_boxes=self.show_detection_boxes,
+            show_labels=self.show_labels,
+            show_confidence=self.show_confidence,
+            show_raw_ppe=os.getenv("KITCHEN_SHOW_RAW_PPE_BOXES", "").lower()
+            in {"1", "true", "yes", "on"},
+        )
 
 
     # --------------------------------------------------------
@@ -1392,14 +1308,16 @@ class KitchenPipeline:
         )
 
 
-        ppe = self._ppe(
-            frame
-        )
+        # Run both models and merge detections into one list.
+        # Assign evidence only when its centre belongs to one person.
+        ppe_detections   = self._ppe(frame)
+        apron_detections = self._apron(frame)
+        all_detections   = ppe_detections + apron_detections
 
 
         assignments = self._associate(
             persons,
-            ppe,
+            all_detections,
         )
 
 
@@ -1493,10 +1411,11 @@ class KitchenPipeline:
         )
 
 
+        # Keep raw detections available for optional diagnostic boxes.
         annotated = self._annotate(
             frame,
             processed_people,
-            ppe,
+            all_detections,
         )
 
 
@@ -1570,15 +1489,13 @@ class KitchenPipeline:
         )
 
 
-        # mp4v (MPEG-4 Part 2) is not decodable by Chrome, Edge or Firefox -
-        # the browser <video> element shows a black frame with 0:00 duration
-        # even though the file itself is valid. make_writer() tries real
-        # H.264 first (falling back to mp4v only if that's unavailable),
-        # same fix already applied for Guard's job output.
+        output_width, output_height = annotation_size(
+            width, height, self.show_labels
+        )
         writer = make_writer(
             self.output_video,
-            width,
-            height,
+            output_width,
+            output_height,
             fps,
         )
 
@@ -1621,14 +1538,8 @@ class KitchenPipeline:
                 if not ok:
 
                     if self.source_type == "upload":
-                        # End of file - the correct, expected way an
-                        # uploaded video finishes.
                         break
 
-                    # Live camera/RTSP: a single failed read is usually
-                    # transient (USB hiccup, exposure change, brief signal
-                    # drop) - reconnect instead of ending the whole session
-                    # on the first glitch.
                     reconnect_attempts += 1
 
                     if (
@@ -1673,16 +1584,6 @@ class KitchenPipeline:
                 )
 
 
-                # Write-then-rename so the stream endpoint (reading this same
-                # path from a different thread, on a timer) never opens a
-                # half-written file. cv2.imwrite() writing the real path
-                # directly let the reader occasionally catch a truncated
-                # JPEG mid-write, which fails to decode in the browser and
-                # kills the whole <img> stream even though this loop and the
-                # backend session keep running fine underneath.
-                # Must still end in .jpg - cv2.imwrite picks its encoder from
-                # the file extension, so a plain "+.tmp" suffix (ending in
-                # ".tmp", not ".jpg") makes it silently fail to write.
                 tmp_frame_path = str(
                     self.latest_frame.with_name(
                         self.latest_frame.stem
@@ -1699,12 +1600,6 @@ class KitchenPipeline:
                         f"Failed to write frame preview: {tmp_frame_path}"
                     )
 
-                # On Windows, os.replace() can transiently fail with
-                # PermissionError if the stream endpoint's reader has the
-                # destination file open at that exact instant (its read is a
-                # brief open+read+close, not a long-held lock). Retry a few
-                # times rather than letting one unlucky collision fail the
-                # whole session.
                 for attempt in range(5):
 
                     try:

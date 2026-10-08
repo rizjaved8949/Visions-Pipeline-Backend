@@ -1,16 +1,23 @@
 import threading
 
+from .tracking import suppress_nested_person_detections
+
 import torch
 from ultralytics import YOLO
 
 from .config import (
     PPE_MODEL_PATH,
+    APRON_MODEL_PATH,
     PERSON_MODEL_PATH,
     PPE_IMAGE_SIZE,
     PPE_CONFIDENCE,
     PPE_IOU,
+    APRON_IMAGE_SIZE,
+    APRON_CONFIDENCE,
+    APRON_IOU,
     DEVICE,
     EXPECTED_CLASSES,
+    EXPECTED_APRON_CLASSES,
 )
 
 
@@ -18,13 +25,15 @@ class KitchenModelRegistry:
 
     def __init__(self):
 
-        self._ppe_model = None
+        self._ppe_model   = None
+        self._apron_model = None
 
-        self._ppe_lock = threading.Lock()
+        self._ppe_lock   = threading.Lock()
+        self._apron_lock = threading.Lock()
 
 
     # --------------------------------------------------------
-    # PPE model
+    # PPE model  (mask / gloves / hairnet — existing)
     # --------------------------------------------------------
 
     def get_ppe_model(self):
@@ -66,8 +75,6 @@ class KitchenModelRegistry:
 
         model = self.get_ppe_model()
 
-        # Ultralytics model objects should not be hit by
-        # multiple application threads simultaneously.
         with self._ppe_lock:
 
             result = model.predict(
@@ -83,6 +90,83 @@ class KitchenModelRegistry:
 
 
     # --------------------------------------------------------
+    # Apron model  (apron / no_apron — new)
+    # --------------------------------------------------------
+
+    def apron_model_available(self) -> bool:
+        """Returns True only when apron_detector_best.pt exists on disk."""
+        return APRON_MODEL_PATH.exists()
+
+
+    def get_apron_model(self):
+        """
+        Lazy-loads the apron model.
+        Raises FileNotFoundError when the weight file is absent —
+        callers should check apron_model_available() first.
+        """
+
+        if self._apron_model is None:
+
+            if not APRON_MODEL_PATH.exists():
+
+                raise FileNotFoundError(
+                    f"Apron model not found: {APRON_MODEL_PATH}\n"
+                    "Train it via the Kaggle notebook and copy "
+                    "apron_detector_best.pt into kitchen_monitoring/weights/"
+                )
+
+            self._apron_model = YOLO(
+                str(APRON_MODEL_PATH)
+            )
+
+            actual_names = {
+                int(k): str(v)
+                for k, v
+                in self._apron_model.names.items()
+            }
+
+            if actual_names != EXPECTED_APRON_CLASSES:
+
+                raise RuntimeError(
+                    "Unexpected apron class mapping.\n"
+                    f"Expected: {EXPECTED_APRON_CLASSES}\n"
+                    f"Model:    {actual_names}"
+                )
+
+        return self._apron_model
+
+
+    def predict_apron(
+        self,
+        frame,
+    ):
+        """
+        Runs the apron model on a frame.
+        Returns the Ultralytics result object (same shape as predict_ppe).
+        Returns None when the model file is absent — pipeline handles
+        this gracefully by skipping apron detections for the frame.
+        """
+
+        if not self.apron_model_available():
+            return None
+
+        model = self.get_apron_model()
+
+        with self._apron_lock:
+
+            result = model.predict(
+                source=frame,
+                imgsz=APRON_IMAGE_SIZE,
+                conf=APRON_CONFIDENCE,
+                iou=APRON_IOU,
+                device=DEVICE,
+                verbose=False,
+            )[0]
+
+        return result
+
+
+    # --------------------------------------------------------
     # Person model
     # --------------------------------------------------------
 
@@ -90,9 +174,12 @@ class KitchenModelRegistry:
 
         # Separate instance per session because tracking state
         # must NOT leak between different camera sessions.
-        return YOLO(
-            PERSON_MODEL_PATH
+        model = YOLO(PERSON_MODEL_PATH)
+        model.add_callback(
+            "on_predict_postprocess_end",
+            suppress_nested_person_detections,
         )
+        return model
 
 
     # --------------------------------------------------------
@@ -111,6 +198,15 @@ class KitchenModelRegistry:
 
             "expected_classes":
                 EXPECTED_CLASSES,
+
+            "apron_model_path":
+                str(APRON_MODEL_PATH),
+
+            "apron_model_exists":
+                APRON_MODEL_PATH.exists(),
+
+            "expected_apron_classes":
+                EXPECTED_APRON_CLASSES,
 
             "device":
                 str(DEVICE),

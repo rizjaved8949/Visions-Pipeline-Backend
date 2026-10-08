@@ -87,6 +87,17 @@ class CameraRequest(
 )
 def health():
 
+    apron_available = MODELS.apron_model_available()
+
+    supported_ppe = [
+        "mask",
+        "gloves",
+        "hair_cover",
+    ]
+
+    if apron_available:
+        supported_ppe.append("apron")
+
     return {
         "status": "ready",
         "models":
@@ -95,20 +106,20 @@ def health():
         "storage":
             str(DB_PATH),
 
-        "supported_ppe": [
-            "mask",
-            "gloves",
-            "hair_cover",
-        ],
+        "supported_ppe":
+            supported_ppe,
 
-        "unsupported_ppe": [
-            "apron",
-        ],
+        "unsupported_ppe":
+            [] if apron_available else ["apron"],
+
+        "apron_model_status":
+            "loaded" if apron_available else "not_found — place apron_detector_best.pt in kitchen_monitoring/weights/",
     }
 
 
 # ============================================================
 # SINGLE IMAGE PPE TEST
+# — returns detections from BOTH models merged
 # ============================================================
 
 @router.post(
@@ -143,11 +154,60 @@ async def detect_image(
         )
 
 
+    detections = []
+
+
+    # ---- PPE model
     try:
 
         result = MODELS.predict_ppe(
             frame
         )
+
+        if result.boxes is not None:
+
+            for box in result.boxes:
+
+                class_id = int(
+                    box.cls[0]
+                    .detach()
+                    .cpu()
+                    .item()
+                )
+
+
+                detections.append(
+                    {
+                        "class_id":
+                            class_id,
+
+                        "class_name":
+                            result.names[
+                                class_id
+                            ],
+
+                        "confidence":
+                            round(float(
+                                box.conf[0]
+                                .detach()
+                                .cpu()
+                                .item()
+                            ), 4),
+
+                        "bbox":
+                            [
+                                float(v)
+                                for v
+                                in box.xyxy[0]
+                                .detach()
+                                .cpu()
+                                .tolist()
+                            ],
+
+                        "source":
+                            "ppe_model",
+                    }
+                )
 
     except FileNotFoundError as exc:
 
@@ -157,12 +217,12 @@ async def detect_image(
         )
 
 
-    detections = []
+    # ---- Apron model (gracefully absent)
+    apron_result = MODELS.predict_apron(frame)
 
+    if apron_result is not None and apron_result.boxes is not None:
 
-    if result.boxes is not None:
-
-        for box in result.boxes:
+        for box in apron_result.boxes:
 
             class_id = int(
                 box.cls[0]
@@ -178,17 +238,17 @@ async def detect_image(
                         class_id,
 
                     "class_name":
-                        result.names[
+                        apron_result.names[
                             class_id
                         ],
 
                     "confidence":
-                        float(
+                        round(float(
                             box.conf[0]
                             .detach()
                             .cpu()
                             .item()
-                        ),
+                        ), 4),
 
                     "bbox":
                         [
@@ -199,6 +259,9 @@ async def detect_image(
                             .cpu()
                             .tolist()
                         ],
+
+                    "source":
+                        "apron_model",
                 }
             )
 
@@ -214,6 +277,9 @@ async def detect_image(
 
         "detections":
             detections,
+
+        "apron_model_available":
+            MODELS.apron_model_available(),
     }
 
 
@@ -316,9 +382,6 @@ def start_camera(
     source = request.source
 
 
-    # Allows:
-    # "0" -> local camera index 0
-    # rtsp://...
     if source.isdigit():
 
         source_value = int(
@@ -523,6 +586,9 @@ def dashboard(
 
         "compliance_trend":
             trend,
+
+        "apron_model_available":
+            MODELS.apron_model_available(),
     }
 
 
@@ -697,13 +763,6 @@ def _mjpeg_generator(session_id):
             ).exists()
         ):
 
-            # The pipeline thread writes this same file via a write-then-
-            # atomic-rename (see pipeline.py) so a reader never sees a
-            # half-written frame - but the rename itself can transiently
-            # deny access to a concurrent reader on Windows. That used to
-            # be an uncaught PermissionError here, which crashed this whole
-            # streaming response (visible as the video dying mid-stream).
-            # Skip this one polling tick and pick up the next frame instead.
             data = None
 
             for attempt in range(5):
@@ -765,9 +824,7 @@ def _mjpeg_generator(session_id):
     "/sessions/current/stream"
 )
 def stream_current():
-    """Stable URL for whichever session is currently active - mirrors the
-    Guard module's /live/current/stream, so the frontend doesn't need a
-    session_id in hand before it can start streaming."""
+    """Stable URL for whichever session is currently active."""
 
     _require_enabled()
 
