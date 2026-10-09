@@ -1,13 +1,7 @@
 import os
 import time
 
-from collections import (
-    Counter,
-    defaultdict,
-    deque,
-)
-
-from pathlib import Path
+from collections import defaultdict
 
 import cv2
 
@@ -20,10 +14,8 @@ from .config import (
     PERSON_CONFIDENCE,
     PERSON_TRACKER_PATH,
     PERSON_IOU,
-    TEMPORAL_WINDOW,
-    TEMPORAL_MIN_VOTES,
     CONFLICT_CONFIDENCE_MARGIN,
-    TRACK_STALE_FRAMES,
+    PERSON_HOLD_SECONDS,
     METRIC_SAMPLE_SECONDS,
     SESSION_DIR,
     SEVERITY_MAP,
@@ -32,6 +24,8 @@ from .config import (
 from .model_registry import MODELS
 from .visualization import annotate_people, annotation_size
 from .tracking import distinct_person_indices
+from .person_state import TemporalState, TrackAdmission, PersonPresence
+from .refinement import PPERefiner
 
 from .storage import (
     STORE,
@@ -122,151 +116,6 @@ REQUIREMENTS = [
     "hair_cover",
     "apron",
 ]
-
-
-# ============================================================
-# TEMPORAL SMOOTHER
-# ============================================================
-
-class TemporalState:
-
-    def __init__(self):
-
-        self.history = defaultdict(
-            lambda: defaultdict(
-                lambda: deque(
-                    maxlen=TEMPORAL_WINDOW
-                )
-            )
-        )
-
-
-    def update(
-        self,
-        track_id,
-        requirement,
-        state,
-        confidence,
-        evidence_type,
-    ):
-
-        history = (
-            self.history[
-                track_id
-            ][
-                requirement
-            ]
-        )
-
-        history.append(
-            {
-                "state":
-                    state,
-
-                "confidence":
-                    confidence,
-
-                "evidence_type":
-                    evidence_type,
-            }
-        )
-
-
-        known = [
-            item
-            for item in history
-            if item["state"]
-            != "unknown"
-        ]
-
-
-        if len(
-            known
-        ) < TEMPORAL_MIN_VOTES:
-
-            return {
-                "state": "unknown",
-                "confidence": 0.0,
-                "evidence_type": None,
-            }
-
-
-        counts = Counter(
-            item["state"]
-            for item in known
-        )
-
-
-        state, votes = (
-            counts.most_common(
-                1
-            )[0]
-        )
-
-
-        if votes < TEMPORAL_MIN_VOTES:
-
-            return {
-                "state": "unknown",
-                "confidence": 0.0,
-                "evidence_type": None,
-            }
-
-
-        selected = [
-            item
-            for item in known
-            if item["state"]
-            == state
-        ]
-
-
-        confidence = (
-            sum(
-                item[
-                    "confidence"
-                ]
-                for item
-                in selected
-            )
-            /
-            len(selected)
-        )
-
-
-        evidence_types = Counter(
-            item[
-                "evidence_type"
-            ]
-            for item
-            in selected
-            if item[
-                "evidence_type"
-            ]
-        )
-
-
-        evidence_type = (
-            evidence_types
-            .most_common(1)[0][0]
-            if evidence_types
-            else None
-        )
-
-
-        return {
-            "state":
-                state,
-
-            "confidence":
-                round(
-                    confidence,
-                    4,
-                ),
-
-            "evidence_type":
-                evidence_type,
-        }
 
 
 # ============================================================
@@ -378,15 +227,19 @@ def _choose_evidence(
     best = ordered[0]
 
 
-    # If model gives two opposite states at nearly
-    # the same confidence, don't invent certainty.
+    # Compare the strongest different class, even if duplicate boxes
+    # for the best class come before it.
     if len(ordered) >= 2:
 
-        second = ordered[1]
+        second = next(
+            (item for item in ordered[1:]
+             if item["evidence_type"] != best["evidence_type"]),
+            best,
+        )
 
         if (
-            second["state"]
-            != best["state"]
+            second["evidence_type"]
+            != best["evidence_type"]
             and
             abs(
                 second[
@@ -467,9 +320,16 @@ class KitchenPipeline:
         self.display_ids = {}
 
         self.next_display_id = 1
+        self.track_id_offset = 0
 
 
         self.track_last_seen = {}
+        self.admission = TrackAdmission()
+        self.presence = PersonPresence()
+        self.refiner = PPERefiner()
+        self.source_fps = 30.0
+        self.frame_time_seconds = 0.0
+        self.started_monotonic = time.monotonic()
 
         # Cumulative, session-wide per-requirement frame tallies.
         self.requirement_frame_counts = {
@@ -560,6 +420,8 @@ class KitchenPipeline:
 
         if result.boxes is None:
 
+            if hasattr(self, "admission"):
+                self.admission.update([], getattr(self, "frame_time_seconds", 0.0))
             return people
 
 
@@ -586,6 +448,8 @@ class KitchenPipeline:
                 continue
 
 
+            track_id += getattr(self, "track_id_offset", 0)
+
             confidence = float(
                 box.conf[0]
                 .detach()
@@ -598,11 +462,6 @@ class KitchenPipeline:
                 {
                     "track_id":
                         track_id,
-
-                    "staff_label":
-                        self._staff_label(
-                            track_id
-                        ),
 
                     "bbox":
                         bbox,
@@ -617,7 +476,19 @@ class KitchenPipeline:
 
 
         kept = distinct_person_indices([person["bbox"] for person in people])
-        return [people[index] for index in kept]
+        if not hasattr(self, "admission"):
+            self.admission = TrackAdmission()
+        accepted = self.admission.update(
+            [people[index] for index in kept], getattr(self, "frame_time_seconds", 0.0))
+        for person in accepted:
+            person["staff_label"] = self._staff_label(person["track_id"])
+        # Align the lost-track frame budget with source/processing cadence.
+        fps = (getattr(self, "source_fps", 30.0) if getattr(self, "source_type", "upload") == "upload"
+               else 1 / max(.001, getattr(self, "observation_period", 1 / 30)))
+        trackers = getattr(getattr(self.person_model, "predictor", None), "trackers", [])
+        for tracker in trackers if isinstance(trackers, (list, tuple)) else []:
+            tracker.max_time_lost = max(1, round(fps * PERSON_HOLD_SECONDS))
+        return accepted
 
 
     # --------------------------------------------------------
@@ -627,10 +498,11 @@ class KitchenPipeline:
     def _ppe(
         self,
         frame,
+        image_size=None,
     ):
 
         result = MODELS.predict_ppe(
-            frame
+            frame, image_size=image_size
         )
 
 
@@ -702,6 +574,7 @@ class KitchenPipeline:
     def _apron(
         self,
         frame,
+        image_size=None,
     ):
         """
         Runs the apron model and returns detections in the same
@@ -714,7 +587,7 @@ class KitchenPipeline:
         """
 
         result = MODELS.predict_apron(
-            frame
+            frame, image_size=image_size
         )
 
         detections = []
@@ -950,6 +823,7 @@ class KitchenPipeline:
                     item[
                         "evidence_type"
                     ],
+                    timestamp=getattr(self, "frame_time_seconds", None),
                 )
             )
 
@@ -994,7 +868,7 @@ class KitchenPipeline:
         result = {
             **person,
 
-            # Display actual class evidence without changing compliance voting.
+            # Preserve raw model evidence for diagnostics; cards use stable state.
             "detected_classes": [
                 {
                     "class_name": item["evidence_type"],
@@ -1288,6 +1162,7 @@ class KitchenPipeline:
             show_boxes=self.show_detection_boxes,
             show_labels=self.show_labels,
             show_confidence=self.show_confidence,
+            thumbnails=getattr(getattr(self, "presence", None), "thumbnails", None),
             show_raw_ppe=os.getenv("KITCHEN_SHOW_RAW_PPE_BOXES", "").lower()
             in {"1", "true", "yes", "on"},
         )
@@ -1303,10 +1178,27 @@ class KitchenPipeline:
         frame_number,
     ):
 
-        persons = self._persons(
-            frame
+        self.frame_time_seconds = (
+            frame_number / self.source_fps if self.source_type == "upload"
+            else time.monotonic() - self.started_monotonic
         )
-
+        previous_time = getattr(self, "last_observation_time", None)
+        if previous_time is not None and self.frame_time_seconds > previous_time:
+            delta = self.frame_time_seconds - previous_time
+            self.observation_period = .5 * getattr(self, "observation_period", delta) + .5 * delta
+        self.last_observation_time = self.frame_time_seconds
+        persons = self._persons(frame)
+        visible_ids = {person["track_id"] for person in persons}
+        previous_ids = getattr(self, "previous_visible_ids", set())
+        # A slow inference call is not a disappearance. Only expire tracks
+        # that are missing now or have actually missed an observation.
+        for track_id, last_seen in list(self.track_last_seen.items()):
+            interrupted = track_id not in visible_ids or track_id not in previous_ids
+            if interrupted and self.frame_time_seconds - last_seen > PERSON_HOLD_SECONDS:
+                STORE.close_track_violations(self.session_id, track_id)
+                self.temporal.forget(track_id)
+                self.track_last_seen.pop(track_id, None)
+        self.previous_visible_ids = visible_ids
 
         # Run both models and merge detections into one list.
         # Assign evidence only when its centre belongs to one person.
@@ -1321,10 +1213,16 @@ class KitchenPipeline:
         )
 
 
+        if not hasattr(self, "refiner"):
+            self.refiner = PPERefiner()
+        extra = self.refiner.refine(
+            frame, persons, assignments, self.temporal.confirmed,
+            self.frame_time_seconds, self._ppe, self._apron, self._associate)
+        if extra:
+            all_detections.extend(extra)
+            assignments = self._associate(persons, all_detections)
+
         processed_people = []
-
-
-        current_ids = set()
 
 
         for person in persons:
@@ -1333,13 +1231,9 @@ class KitchenPipeline:
                 "track_id"
             ]
 
-            current_ids.add(
-                track_id
-            )
-
             self.track_last_seen[
                 track_id
-            ] = frame_number
+            ] = self.frame_time_seconds
 
 
             state = self._person_state(
@@ -1370,36 +1264,8 @@ class KitchenPipeline:
                 ] += 1
 
 
-        # Clean stale tracks
-        for track_id in list(
-            self.track_last_seen
-        ):
-
-            last_seen = (
-                self.track_last_seen[
-                    track_id
-                ]
-            )
-
-
-            if (
-                frame_number
-                -
-                last_seen
-                >
-                TRACK_STALE_FRAMES
-            ):
-
-                STORE.close_track_violations(
-                    self.session_id,
-                    track_id,
-                )
-
-                self.track_last_seen.pop(
-                    track_id,
-                    None,
-                )
-
+        display_people, _ = self.presence.update(
+            processed_people, frame, self.frame_time_seconds)
 
         self._update_violations(
             processed_people
@@ -1414,7 +1280,7 @@ class KitchenPipeline:
         # Keep raw detections available for optional diagnostic boxes.
         annotated = self._annotate(
             frame,
-            processed_people,
+            display_people,
             all_detections,
         )
 
@@ -1424,6 +1290,20 @@ class KitchenPipeline:
             summary,
         )
 
+
+    def _reset_after_source_gap(self):
+        """A long disconnected source cannot establish person continuity."""
+        for track_id in self.track_last_seen:
+            STORE.close_track_violations(self.session_id, track_id)
+        self.track_id_offset = max(self.display_ids, default=self.track_id_offset) + 1
+        self.person_model = MODELS.create_person_tracker()
+        self.temporal = TemporalState()
+        self.admission = TrackAdmission()
+        self.presence = PersonPresence()
+        self.refiner = PPERefiner()
+        self.track_last_seen.clear()
+        self.previous_visible_ids = set()
+        self.last_observation_time = None
 
     # --------------------------------------------------------
     # Main source processing
@@ -1466,6 +1346,8 @@ class KitchenPipeline:
 
             fps = 25.0
 
+
+        self.source_fps = fps
 
         total_frames = int(
             cap.get(
@@ -1540,6 +1422,8 @@ class KitchenPipeline:
                     if self.source_type == "upload":
                         break
 
+                    if reconnect_attempts == 0:
+                        capture_failed_at = time.monotonic()
                     reconnect_attempts += 1
 
                     if (

@@ -1,6 +1,6 @@
 import unittest
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import numpy as np
 
@@ -61,6 +61,13 @@ class PersonPresentationTests(unittest.TestCase):
         people[0]["apron"]["state"] = "violation"
         c = annotate_people(frame, people, [])
         self.assertEqual(tuple(c[100, 20]), color)
+
+    def test_card_order_follows_staff_labels_not_native_tracker_order(self):
+        people = [dict(person(2), staff_label="STAFF-02"), dict(person(30), staff_label="STAFF-01")]
+        with patch("kitchen_monitoring.visualization._text") as draw:
+            annotate_people(np.zeros((360, 202, 3), dtype=np.uint8), people, [])
+        labels = [call.args[1] for call in draw.call_args_list if call.args[1].startswith("STAFF-")]
+        self.assertEqual(labels, ["STAFF-01", "STAFF-02", "STAFF-01", "STAFF-02"])
 
     def test_display_preferences_and_source_coordinates(self):
         frame = np.zeros((360, 202, 3), dtype=np.uint8)

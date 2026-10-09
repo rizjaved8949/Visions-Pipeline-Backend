@@ -71,6 +71,7 @@ class KitchenModelRegistry:
     def predict_ppe(
         self,
         frame,
+        image_size=None,
     ):
 
         model = self.get_ppe_model()
@@ -79,7 +80,7 @@ class KitchenModelRegistry:
 
             result = model.predict(
                 source=frame,
-                imgsz=PPE_IMAGE_SIZE,
+                imgsz=image_size or PPE_IMAGE_SIZE,
                 conf=PPE_CONFIDENCE,
                 iou=PPE_IOU,
                 device=DEVICE,
@@ -139,6 +140,7 @@ class KitchenModelRegistry:
     def predict_apron(
         self,
         frame,
+        image_size=None,
     ):
         """
         Runs the apron model on a frame.
@@ -156,7 +158,7 @@ class KitchenModelRegistry:
 
             result = model.predict(
                 source=frame,
-                imgsz=APRON_IMAGE_SIZE,
+                imgsz=image_size or APRON_IMAGE_SIZE,
                 conf=APRON_CONFIDENCE,
                 iou=APRON_IOU,
                 device=DEVICE,

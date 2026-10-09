@@ -131,8 +131,19 @@ TEMPORAL_MIN_VOTES = 3
 CONFLICT_CONFIDENCE_MARGIN = 0.05
 
 
-# Close tracks after this many missing processed frames.
-TRACK_STALE_FRAMES = 30
+# Source-time evidence/card retention and admission of new staff identities.
+PPE_EVIDENCE_SECONDS = 1.0
+# Count actual observations within this window, not empty video frames.
+PPE_CONFIRM_SECONDS = 1.0
+# Slow streams need enough time for three distinct observations; never keep
+# an arbitrarily old vote to manufacture confirmation.
+PPE_CONFIRM_MAX_SECONDS = 6.0
+# Clothing stays on through brief missed detections; contradictory evidence
+# still clears a held decision immediately. Mask retains the shorter timeout.
+PPE_HOLD_SECONDS = {"mask": 1.0, "gloves": 3.0, "hair_cover": 3.0, "apron": 3.0}
+PERSON_HOLD_SECONDS = 2.0
+PERSON_CONFIRM_FRAMES = 3
+PERSON_CONFIRM_CONFIDENCE = 0.60
 
 
 # Dashboard trend sample frequency
@@ -174,3 +185,14 @@ SEVERITY_MAP = {
     "no_hairnet"    : "warning",
     "no_apron"      : "warning",
 }
+
+# Bounded rechecks for unresolved PPE, across all four requirements.
+PPE_RECHECK_ENABLED = True
+PPE_RECHECK_IMAGE_SIZE = 1024
+APRON_RECHECK_IMAGE_SIZE = 512
+PPE_RECHECK_MAX_PEOPLE = 2
+PPE_RECHECK_MAX_HEIGHT_RATIO = 0.70
+
+# Small people can be retried immediately; nearby people are retried only
+# after an unresolved interval, avoiding extra work on a one-frame miss.
+PPE_RECHECK_NEAR_DELAY_SECONDS = 0.5

@@ -52,15 +52,15 @@ class DetectedClassTests(unittest.TestCase):
             "state": "violation", "evidence_type": "incorrect_mask", "confidence": 0.75}}
         self.assertEqual(detected_class_rows(result), [("incorrect_mask", 0.75)])
 
-    def test_card_renders_classes_and_respects_confidence_preference(self):
-        result = self.pipeline._person_state(self.person, [self.detection("incorrect_mask")])
+    def test_card_shows_only_id_and_fixed_confirmed_status_rows(self):
+        for _ in range(3):
+            result = self.pipeline._person_state(self.person, [self.detection("incorrect_mask")])
         frame = np.zeros((360, 202, 3), dtype=np.uint8)
-        for show_confidence, expected in ((True, "incorrect_mask  82%"), (False, "incorrect_mask")):
+        for show_confidence in (True, False):
             with patch("kitchen_monitoring.visualization._text") as draw:
                 annotate_people(frame, [result], [], show_confidence=show_confidence)
                 texts = [call.args[1] for call in draw.call_args_list]
-            self.assertIn(expected, texts)
-            self.assertFalse(any("UNKNOWN" in text or "MISSING / INCORRECT" in text for text in texts))
+            self.assertEqual(texts, ["STAFF-01", "STAFF-01", "Mask", "Incorrect mask", "Gloves", "-", "Hairnet", "-", "Apron", "-"])
 
 
 if __name__ == "__main__":

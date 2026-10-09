@@ -36,6 +36,25 @@ def detected_class_rows(person):
         if item.get("class_name") in CLASS_COLORS
     ]
 
+STATUS_LABELS = {
+    "mask": ("Mask", {"mask": "Worn", "no_mask": "Not worn", "incorrect_mask": "Incorrect mask"}),
+    "gloves": ("Gloves", {"glove": "Worn", "no_glove": "Missing"}),
+    "hair_cover": ("Hairnet", {"hairnet": "Worn", "no_hairnet": "Not worn"}),
+    "apron": ("Apron", {"apron": "Apron", "no_apron": "No apron"}),
+}
+
+
+def status_rows(person):
+    """Always four rows; absence of evidence is never a negative prediction."""
+    rows = []
+    for requirement, (label, statuses) in STATUS_LABELS.items():
+        evidence = person.get(requirement, {})
+        confirmed = evidence.get("state") in {"compliant", "violation"}
+        name = evidence.get("evidence_type") if confirmed else None
+        rows.append((label, statuses.get(name, "-"), evidence.get("state", "unknown")))
+    return rows
+
+
 def annotation_size(width, height, show_labels=True):
     # Enlarge the presentation, not the inference image. Even sizes suit H.264.
     out_height = max(720, min(1080, int(height)))
@@ -55,13 +74,18 @@ def _text(image, text, xy, color=(235, 238, 242), scale=0.48, thickness=1):
 
 
 def annotate_people(frame, persons, detections, *, show_boxes=True,
-                    show_labels=True, show_confidence=True, show_raw_ppe=False):
+                    show_labels=True, show_confidence=True, show_raw_ppe=False,
+                    thumbnails=None):
     height, width = frame.shape[:2]
     out_width, out_height = annotation_size(width, height, show_labels)
     scene_width = out_width - (PANEL_WIDTH if show_labels else 0)
     scene = cv2.resize(frame, (scene_width, out_height), interpolation=cv2.INTER_LINEAR)
     sx, sy = scene_width / width, out_height / height
-    people = sorted(persons, key=lambda p: p["track_id"])
+    def display_order(person):
+        suffix = person["staff_label"].rsplit("-", 1)[-1]
+        return int(suffix) if suffix.isdigit() else person["track_id"]
+
+    people = sorted(persons, key=display_order)
 
     def scaled_box(bbox):
         x1, y1, x2, y2 = bbox
@@ -77,6 +101,8 @@ def annotate_people(frame, persons, detections, *, show_boxes=True,
 
     occupied = []
     for person in people:
+        if not person.get("visible", True):
+            continue
         x1, y1, x2, y2 = scaled_box(person["bbox"])
         color = person_color(person["track_id"])
         if show_boxes:
@@ -113,37 +139,34 @@ def annotate_people(frame, persons, detections, *, show_boxes=True,
     if not show_labels:
         return scene
 
-    # Render every visible person. Keep encoded dimensions fixed as people enter.
-    panel_height = max(out_height, 84 + len(people) * 128)
-    panel = np.full((panel_height, PANEL_WIDTH, 3), (27, 23, 20), dtype=np.uint8)
-    _text(panel, "MODEL CLASSES", (16, 28), scale=0.65, thickness=2)
-    _text(panel, "Only detected classes are listed", (16, 51), scale=0.45)
-    if not people:
-        _text(panel, "No confirmed person tracks", (16, 98))
+    # Minimal presentation: photo, staff ID and four status rows only.
+    panel_height = max(out_height, 12 + len(people) * 254)
+    panel = np.full((panel_height, PANEL_WIDTH, 3), (245, 240, 233), dtype=np.uint8)
     for index, person in enumerate(people):
-        top = 68 + index * 128
+        top = 12 + index * 254
         color = person_color(person["track_id"])
-        cv2.rectangle(panel, (12, top), (PANEL_WIDTH - 12, top + 118), (43, 37, 32), -1)
-        cv2.rectangle(panel, (12, top), (16, top + 118), color, -1)
-        x1, y1, x2, y2 = person["bbox"]
-        crop = frame[max(0, int(y1)):min(height, int(y2)),
-                     max(0, int(x1)):min(width, int(x2))]
-        if crop.size:
-            ratio = min(62 / crop.shape[1], 92 / crop.shape[0])
-            thumb = cv2.resize(crop, (max(1, round(crop.shape[1] * ratio)),
-                                     max(1, round(crop.shape[0] * ratio))))
+        cv2.rectangle(panel, (12, top), (PANEL_WIDTH - 12, top + 242), (252, 250, 247), -1)
+        cv2.rectangle(panel, (12, top), (16, top + 242), color, -1)
+        thumb = (thumbnails or {}).get(person["track_id"])
+        if thumb is None and person.get("visible", True):
+            x1, y1, x2, y2 = person["bbox"]
+            crop = frame[max(0, int(y1)):min(height, int(y1 + (y2 - y1) * 0.45)), max(0, int(x1)):min(width, int(x2))]
+            if crop.size:
+                ratio = min(54 / crop.shape[1], 66 / crop.shape[0])
+                thumb = cv2.resize(crop, (max(1, round(crop.shape[1] * ratio)), max(1, round(crop.shape[0] * ratio))))
+        if thumb is not None:
             th, tw = thumb.shape[:2]
-            panel[top + 12:top + 12 + th, 24:24 + tw] = thumb
-        title = person["staff_label"]
-        if show_confidence:
-            title += "  person {:.0%}".format(person.get("person_confidence", 0))
-        _text(panel, title, (98, top + 23), color, 0.5, 1)
-        for row, (class_name, confidence) in enumerate(detected_class_rows(person)):
-            text = class_name
-            if show_confidence:
-                text += f"  {confidence:.0%}"
-            _text(panel, text, (98, top + 47 + row * 20),
-                  CLASS_COLORS[class_name], 0.50)
+            panel[top + 14:top + 14 + th, 24:24 + tw] = thumb
+        _text(panel, person["staff_label"], (94, top + 39), (48, 37, 23), 0.59, 2)
+        for row, (label, status, state) in enumerate(status_rows(person)):
+            y = top + 111 + row * 37
+            cv2.line(panel, (28, y - 23), (PANEL_WIDTH - 24, y - 23), (232, 226, 218), 1)
+            _text(panel, label, (28, y), (54, 42, 28), 0.48)
+            status_color = {"compliant": (69, 116, 32), "violation": (35, 87, 168)}.get(state, (140, 127, 112))
+            if not person.get("visible", True):
+                status_color = (145, 132, 117)
+            text_width = cv2.getTextSize(status, FONT, 0.48, 1)[0][0]
+            _text(panel, status, (PANEL_WIDTH - 24 - text_width, y), status_color, 0.48)
     if panel_height != out_height:
         panel = cv2.resize(panel, (PANEL_WIDTH, out_height), interpolation=cv2.INTER_AREA)
     return np.concatenate((scene, panel), axis=1)
