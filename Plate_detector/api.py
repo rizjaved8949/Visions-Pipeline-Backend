@@ -4,6 +4,7 @@ import base64
 import os
 import time
 import uuid
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
@@ -230,9 +231,59 @@ def get_plates(job_id: str):
             "raw_image_url": (
                 f"/api/alpr/jobs/{job_id}/plates/{Path(p['raw_image']).name}" if p.get("raw_image") else None
             ),
+            "pending": False,
         })
+
     counts = {"plates_saved": len(plates) - lowconf, "lowconf_quarantined": lowconf}
+    # Compared as strings: results.csv is read with csv.DictReader, so its
+    # track_id is text, while a pending one is parsed from a filename.
+    finalized_ids = {str(p.get("track_id")) for p in plates}
+    plates.extend(_pending_plates(job_id, job, finalized_ids))
     return {"job_id": job_id, "plates": plates, "counts": counts}
+
+
+def _pending_plates(job_id: str, job, finalized_ids: set) -> list[dict]:
+    """Tracks that have a plate crop but haven't finalized yet.
+
+    A track is only written to results.csv once it finalizes (its best crop
+    stops improving, or the vehicle leaves), which can be long after the plate
+    first appears on screen. These rows let the UI show a detection as it
+    happens; each is replaced by its real, enhanced row once the track
+    finalizes. They carry no scores - nothing has been measured yet - and are
+    flagged so the UI can mark them as provisional rather than pass an
+    un-enhanced crop off as a finished result."""
+    pending_dir = Path(job.output_dir) / "plates_pending"
+    if not pending_dir.is_dir():
+        return []
+
+    rows = []
+    for path in sorted(pending_dir.glob("track_*.jpg")):
+        # track_<id>_<cls>.jpg, written by ALPRPipeline._write_pending_crops
+        parts = path.stem.split("_", 2)
+        if len(parts) < 3:
+            continue
+        track_id = parts[1]
+        if not track_id.isdigit() or track_id in finalized_ids:
+            continue
+        try:
+            stamp = datetime.fromtimestamp(path.stat().st_mtime)
+        except OSError:
+            continue
+        rows.append({
+            "track_id": track_id,
+            "vehicle": parts[2],
+            "plate_conf": None,
+            "quality": None,
+            "low_conf": False,
+            "timestamp": stamp.strftime("%Y%m%d_%H%M%S_") + f"{stamp.microsecond // 1000:03d}",
+            # The file is rewritten in place each time the track's best crop
+            # improves, so the URL carries its mtime - otherwise the browser
+            # would keep showing the first crop it fetched for that track.
+            "image_url": f"/api/alpr/jobs/{job_id}/plates/{path.name}?v={int(path.stat().st_mtime)}",
+            "raw_image_url": None,
+            "pending": True,
+        })
+    return rows
 
 
 @router.get("/jobs/{job_id}/plates/{filename}")
@@ -243,10 +294,17 @@ def get_plate_image(job_id: str, filename: str):
     if "/" in filename or "\\" in filename or filename in (".", ".."):
         raise HTTPException(status_code=400, detail="Invalid filename")
     output_dir = Path(job.output_dir)
-    for sub in ("plates", "plates_lowconf"):
+    for sub in ("plates", "plates_lowconf", "plates_pending"):
         candidate = output_dir / sub / filename
         if candidate.exists():
-            return FileResponse(candidate)
+            # A pending crop is rewritten in place as the track's best improves,
+            # so it must never be served from cache.
+            headers = (
+                {"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"}
+                if sub == "plates_pending"
+                else {}
+            )
+            return FileResponse(candidate, headers=headers)
     raise HTTPException(status_code=404, detail="Plate image not found")
 
 

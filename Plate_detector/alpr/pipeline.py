@@ -191,6 +191,46 @@ class ALPRPipeline:
         self.show_labels = bool(display_prefs.get("show_labels", True))
         self.show_confidence = bool(display_prefs.get("show_confidence", True))
 
+        # Best-crop-so-far previews for tracks that have not finalized yet.
+        self.pending_dir = Path(cfg.output.dir) / "plates_pending"
+        # track_id -> (best_score_frame already on disk, filename written)
+        self._pending_written: dict[int, tuple[int, str]] = {}
+
+    # ------------------------------------------------------------------ #
+    def _write_pending_crops(self, frame_id: int) -> None:
+        """Write the current best raw crop for each unfinalized track that has
+        one, so the host can show it while the job is still running.
+
+        Only rewrites when a track's best crop has actually improved, so this
+        costs one small JPEG per genuine improvement rather than per frame. A
+        finalized track's file is removed - the real enhanced image has taken
+        over by then."""
+        for tid, t in self.tracks.tracks.items():
+            written = self._pending_written.get(tid)
+            if t.finalized:
+                if written is not None:
+                    (self.pending_dir / written[1]).unlink(missing_ok=True)
+                    del self._pending_written[tid]
+                continue
+            if not t.best:
+                continue
+            if written is not None and written[0] == t.best_score_frame:
+                continue
+
+            crop = t.best[0].crop
+            if crop is None or crop.size == 0:
+                continue
+            # The class is in the name so the host can label the row without
+            # needing any other lookup while the track is still in progress.
+            safe_cls = re.sub(r"[^A-Za-z0-9_-]", "", t.cls_name or "vehicle") or "vehicle"
+            name = f"track_{tid}_{safe_cls}.jpg"
+            try:
+                self.pending_dir.mkdir(parents=True, exist_ok=True)
+                _write_latest_frame(self.pending_dir / name, crop)
+                self._pending_written[tid] = (t.best_score_frame, name)
+            except Exception:  # noqa: BLE001 - a preview is never worth failing a job over
+                pass
+
     # ------------------------------------------------------------------ #
     def run(self, stop_event=None, progress_callback=None, latest_frame_path=None):
         """Blocking. `stop_event` (threading.Event) lets a host shut it down cleanly
@@ -268,6 +308,15 @@ class ALPRPipeline:
                 # ---- Stage 3: track bookkeeping -> finalize
                 for t in self.tracks.update(frame_id, vehicles, plates, frame):
                     self.worker.submit(t)
+
+                # A track isn't saved until it finalizes (its best crop stops
+                # improving, or the vehicle leaves), which can be long after the
+                # plate first appears on screen. Publish the best raw crop so far
+                # for tracks still in progress, so a reviewer watching the job
+                # run sees which plates have been picked up instead of waiting
+                # for the whole video. These are replaced by the real enhanced
+                # image once the track finalizes.
+                self._write_pending_crops(frame_id)
 
                 # collect finished results from the worker
                 while True:
