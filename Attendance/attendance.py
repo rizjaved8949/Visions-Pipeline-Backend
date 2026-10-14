@@ -501,9 +501,15 @@ def process_image_bytes(image_bytes):
     return buf.tobytes(), 'image/jpeg', summary
 
 
-def process_video_bytes(video_bytes):
+def process_video_bytes(video_bytes, stop_event=None, progress_cb=None):
     """Run recognition on every frame of an uploaded video.
-    Returns (mp4_bytes, media_type, summary), boxes + labels drawn into the video."""
+    Returns (mp4_bytes, media_type, summary), boxes + labels drawn into the video.
+
+    stop_event: optional threading.Event - checked once per frame so a caller
+    can cut processing short (the partial video written so far is still
+    returned, same as reaching the end of the clip early).
+    progress_cb: optional callable(frames_done, total_frames or None), called
+    once per frame so a background job can report real-time progress."""
     ensure_face_model()
 
     with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as tmp_in:
@@ -520,6 +526,7 @@ def process_video_bytes(video_bytes):
     fps = cap.get(cv2.CAP_PROP_FPS) or 25
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) or None
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     writer = cv2.VideoWriter(out_path, fourcc, fps, (width, height))
 
@@ -532,6 +539,8 @@ def process_video_bytes(video_bytes):
 
     try:
         while True:
+            if stop_event is not None and stop_event.is_set():
+                break
             ret, frame = cap.read()
             if not ret:
                 break
@@ -560,6 +569,9 @@ def process_video_bytes(video_bytes):
             display_frame = frame.copy()
             draw_detections(display_frame, recognized_matches, unknown_faces)
             writer.write(display_frame)
+
+            if progress_cb is not None:
+                progress_cb(frame_count, total_frames)
     finally:
         cap.release()
         writer.release()

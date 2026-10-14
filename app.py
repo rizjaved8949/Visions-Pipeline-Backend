@@ -296,6 +296,12 @@ def stop_all_jobs():
     except Exception as exc:  # noqa: BLE001
         print(f"[WARN] Could not stop ALPR jobs: {exc}")
 
+    try:
+        from Attendance.media_jobs import get_service as get_attendance_media_service
+        get_attendance_media_service().stop_all()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[WARN] Could not stop Attendance media jobs: {exc}")
+
 
 if __name__ == "__main__":
     main()

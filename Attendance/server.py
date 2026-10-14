@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from . import attendance
+from . import attendance, media_jobs
 
 REPORT_MEDIA_TYPES = {
     "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -182,32 +182,66 @@ async def register_person(name: str = Form(...), file: UploadFile = File(...)):
     return {"name": safe_name, "people": attendance.get_registered_people()}
 
 
-@app.post("/api/process_media")
-async def process_media(file: UploadFile = File(...)):
+@app.post("/api/media_jobs", status_code=202)
+async def create_media_job(file: UploadFile = File(...)):
+    """Start a background recognition pass over an uploaded image/video.
+
+    Returns an id immediately rather than blocking until the whole clip is
+    done, so the frontend can keep polling progress - and re-attach to the job
+    - across page changes."""
     _require_enabled()
     _ensure_faces_loaded()
     if not attendance.all_required_persons:
         raise HTTPException(400, "Register at least one person before uploading media.")
 
-    content = await file.read()
     content_type = file.content_type or ""
+    if not (content_type.startswith("image") or content_type.startswith("video")):
+        raise HTTPException(400, "Unsupported file type - upload an image or video.")
 
-    try:
-        if content_type.startswith("image"):
-            result_bytes, media_type, summary = attendance.process_image_bytes(content)
-        elif content_type.startswith("video"):
-            result_bytes, media_type, summary = attendance.process_video_bytes(content)
-        else:
-            raise HTTPException(400, "Unsupported file type - upload an image or video.")
-    except ValueError as e:
-        raise HTTPException(400, str(e))
+    content = await file.read()
+    return media_jobs.get_service().submit(content, content_type, file.filename or "upload")
 
-    return {
-        "media_type": media_type,
-        "media_base64": base64.b64encode(result_bytes).decode("ascii"),
-        "summary": summary,
-        "source_filename": file.filename or "upload",
-    }
+
+def _media_job_or_404(job_id: str):
+    job = media_jobs.get_service().get(job_id)
+    if job is None:
+        raise HTTPException(404, "Media job not found")
+    return job
+
+
+@app.get("/api/media_jobs/{job_id}")
+def get_media_job(job_id: str):
+    _require_enabled()
+    return _media_job_or_404(job_id).public()
+
+
+@app.post("/api/media_jobs/{job_id}/stop")
+def stop_media_job(job_id: str):
+    """Cuts processing short. The partial video produced so far is still
+    retrievable from /result, so Stop behaves like reaching the clip's end
+    early rather than discarding the work."""
+    _require_enabled()
+    _media_job_or_404(job_id)
+    media_jobs.get_service().request_stop(job_id)
+    return {"job_id": job_id, "status": "stopping"}
+
+
+@app.get("/api/media_jobs/{job_id}/result")
+def get_media_job_result(job_id: str):
+    _require_enabled()
+    job = _media_job_or_404(job_id)
+    snapshot = job.public()
+    if snapshot["status"] in media_jobs.LIVE_STATUSES:
+        raise HTTPException(409, f"Media job is not finished; status={snapshot['status']}")
+    with job.lock:
+        if job.result is None:
+            raise HTTPException(409, job.error or "Media job produced no result")
+        return {
+            "media_type": job.media_type,
+            "media_base64": base64.b64encode(job.result).decode("ascii"),
+            "summary": job.summary,
+            "source_filename": job.source_filename,
+        }
 
 
 class MediaReportRequest(BaseModel):
@@ -220,9 +254,9 @@ class MediaReportRequest(BaseModel):
 def media_report(body: MediaReportRequest):
     """Build a report for an already-processed upload in the requested
     format. Takes the summary the frontend already has (from
-    /api/process_media) rather than caching anything server-side. Does NOT
-    wipe - that's still triggered separately by downloading the result/report
-    or leaving the media view (see /api/wipe_data)."""
+    /api/media_jobs/{id}/result) rather than caching anything server-side.
+    Does NOT wipe - that's still triggered separately by downloading the
+    result/report or leaving the media view (see /api/wipe_data)."""
     _require_enabled()
     if body.format not in REPORT_MEDIA_TYPES:
         raise HTTPException(400, "format must be 'xlsx' or 'pdf'.")
@@ -258,7 +292,18 @@ async def video_feed(request: Request):
         except asyncio.CancelledError:
             pass
 
-    return StreamingResponse(generate(), media_type="multipart/x-mixed-replace; boundary=frame")
+    return StreamingResponse(
+        generate(),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+        # Without these the aborted response is heuristically cacheable, so
+        # reopening the feed (e.g. navigating back to the page) can repaint the
+        # previous stream's last frame before the new connection delivers one,
+        # which looks like a frozen camera.
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+        },
+    )
 
 
 def run(host="0.0.0.0", port=8000):

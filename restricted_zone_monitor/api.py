@@ -202,4 +202,14 @@ async def video_feed(request: Request):
         except asyncio.CancelledError:
             pass
 
-    return StreamingResponse(generate(), media_type="multipart/x-mixed-replace; boundary=frame")
+    return StreamingResponse(
+        generate(),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+        # Without these the aborted response is heuristically cacheable, so
+        # reopening the feed can repaint the previous stream's last frame before
+        # the new connection delivers one, which looks like a frozen camera.
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+        },
+    )

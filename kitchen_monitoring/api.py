@@ -732,6 +732,18 @@ def latest_frame(
 # MJPEG STREAM
 # ============================================================
 
+# Without these the aborted response is heuristically cacheable, so reopening
+# the feed (e.g. navigating back to the page) can repaint the previous stream's
+# last frame before the new connection delivers one, which looks frozen.
+_NO_CACHE_HEADERS = {
+    "Cache-Control": (
+        "no-store, no-cache,"
+        " must-revalidate, max-age=0"
+    ),
+    "Pragma": "no-cache",
+}
+
+
 def _mjpeg_generator(session_id):
 
     while True:
@@ -845,6 +857,7 @@ def stream_current():
             "multipart/x-mixed-replace;"
             " boundary=frame"
         ),
+        headers=_NO_CACHE_HEADERS,
     )
 
 
@@ -872,6 +885,7 @@ def stream(
             "multipart/x-mixed-replace;"
             " boundary=frame"
         ),
+        headers=_NO_CACHE_HEADERS,
     )
 
 

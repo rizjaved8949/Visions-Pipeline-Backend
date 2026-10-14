@@ -287,4 +287,11 @@ def get_job_stream(job_id: str):
     return StreamingResponse(
         _job_stream_generator(job_id),
         media_type="multipart/x-mixed-replace; boundary=frame",
+        # Without these the aborted response is heuristically cacheable, so
+        # reopening the feed can repaint the previous stream's last frame before
+        # the new connection delivers one, which looks like stalled processing.
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+        },
     )
