@@ -91,13 +91,20 @@ class GuardJobService:
                 status = payload.get("status", "processing")
                 if status == "completed":
                     status = "processing"
-                self.store.update(
-                    job_id,
-                    status=status,
-                    progress=payload.get("progress"),
-                    frames_processed=int(payload.get("frames_processed", 0)),
-                    total_frames=payload.get("total_frames"),
-                )
+                changes = {
+                    "status": status,
+                    "progress": payload.get("progress"),
+                    "frames_processed": int(payload.get("frames_processed", 0)),
+                    "total_frames": payload.get("total_frames"),
+                }
+                # A running tally, so /jobs/{id}/summary can serve live duty and
+                # active figures while the video is still being analysed rather
+                # than only once summary.json is written at the end. Marked
+                # "partial" by the pipeline so a reader can tell the two apart.
+                running = payload.get("summary")
+                if running is not None:
+                    changes["summary"] = running
+                self.store.update(job_id, **changes)
 
             summary = GuardMonitoringPipeline(cfg, progress_callback=progress).run(stop_event=stop_event)
             self.store.update(

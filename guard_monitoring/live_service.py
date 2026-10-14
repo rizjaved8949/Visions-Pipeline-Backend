@@ -82,6 +82,10 @@ class _LiveSession:
             "sleep_candidate_frames": 0,
             "phone_use_frames": 0,
             "absence_frames": 0,
+            # Present, moving and awake - the complement of the stationary /
+            # sleeping / absent frames counted above, so "active" and
+            # "inactive" time add up against the same denominator.
+            "active_frames": 0,
         }
     )
     events: deque = field(default_factory=lambda: deque(maxlen=1000))
@@ -483,6 +487,12 @@ class GuardLiveService:
                             session.stats["phone_use_frames"] += 1
                         if fl.get("present") is False:
                             session.stats["absence_frames"] += 1
+                        if (
+                            fl.get("present") is True
+                            and not mv.get("stationary")
+                            and not sl.get("candidate")
+                        ):
+                            session.stats["active_frames"] += 1
                         session.latest_jpeg = jpeg
                         if jpeg is not None:
                             session.frame_version += 1

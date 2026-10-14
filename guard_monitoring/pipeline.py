@@ -175,6 +175,10 @@ class GuardMonitoringPipeline:
         stationary_frames = 0
         display_status_counts = {}
         absence_frames = 0
+        # Present, moving and awake - the complement of the stationary /
+        # sleeping / absent frames counted above, so "active" and "inactive"
+        # time add up against the same denominator.
+        active_frames = 0
         events_count = 0
         frame_errors = 0
         started_wall = time.time()
@@ -244,6 +248,11 @@ class GuardMonitoringPipeline:
                     for label in result["frame_log"].get("display_statuses", []):
                         display_status_counts[label] = display_status_counts.get(label, 0) + 1
                     absence_frames += int(result["frame_log"].get("present") is False)
+                    active_frames += int(
+                        result["frame_log"].get("present") is True
+                        and not bool(movement_data.get("stationary"))
+                        and not result["sleep"].candidate
+                    )
                     events_count += result["events_count"]
 
                     for event in result["events"]:
@@ -264,7 +273,21 @@ class GuardMonitoringPipeline:
                             break
 
                     frame_count += 1
-                    self._maybe_progress(frame_count, total_frames)
+                    self._maybe_progress(
+                        frame_count,
+                        total_frames,
+                        stats={
+                            "fps": fps,
+                            "frames_processed": frame_count,
+                            "guard_visible_frames": guard_visible_frames,
+                            "phone_use_frames": phone_use_frames,
+                            "sleep_candidate_frames": sleep_candidate_frames,
+                            "stationary_frames": stationary_frames,
+                            "absence_frames": absence_frames,
+                            "active_frames": active_frames,
+                            "partial": True,
+                        },
+                    )
             finally:
                 cap.release()
                 writer.release()
@@ -299,6 +322,7 @@ class GuardMonitoringPipeline:
             "primary_status_classes": list(PRIMARY_STATUSES),
             "display_status_counts": display_status_counts,
             "absence_frames": absence_frames,
+            "active_frames": active_frames,
             "events_triggered": events_count,
             "processing_wall_seconds": round(wall_seconds, 3),
             "output_video": str(video_path),
@@ -1020,10 +1044,15 @@ class GuardMonitoringPipeline:
                 statuses.append("Stationary")
         return statuses
 
-    def _maybe_progress(self, processed: int, total: int) -> None:
+    def _maybe_progress(self, processed: int, total: int, stats: dict | None = None) -> None:
+        """`stats` is a running (not final) tally, published on each tick so a
+        host can show live duty/active/inactive figures while the video is still
+        being analysed, instead of only once the job ends. It is carried in the
+        same `summary` slot the completed run uses, so no extra plumbing is
+        needed - it is simply a partial summary."""
         every = max(1, int(self.cfg.get("api", {}).get("progress_every_frames", 25)))
         if processed % every == 0 or (total and processed >= total):
-            self._progress("processing", processed, total)
+            self._progress("processing", processed, total, summary=stats)
 
     def _progress(self, status: str, processed: int, total: int, summary: dict | None = None) -> None:
         if self.progress_callback is None:
