@@ -39,6 +39,14 @@ def _float(name: str, default: float) -> float:
     return default if raw is None or raw.strip() == "" else float(raw)
 
 
+def _is_set(name: str) -> bool:
+    """Whether the operator gave this variable a real value, as opposed to it
+    being absent or blank. Lets an explicit setting take precedence over a
+    mode's built-in default instead of being silently discarded."""
+    raw = os.getenv(name)
+    return raw is not None and raw.strip() != ""
+
+
 def _json(name: str, default: Any) -> Any:
     raw = os.getenv(name)
     if raw is None or raw.strip() == "":
@@ -65,6 +73,11 @@ def load_config(
     No YAML profile is required. Runtime-only values such as source/output can be
     supplied by the API worker or CLI without mutating environment variables.
     """
+    # Re-read .env on every build (this runs once per job/session, not per
+    # frame) so editing a threshold takes effect on the next run instead of
+    # needing a backend restart. .env is this module's documented source of
+    # truth, hence override=True.
+    load_dotenv(override=True)
 
     duty_zone = _json(
         "GUARD_DUTY_ZONE_JSON",
@@ -328,13 +341,24 @@ def load_config(
         # thresholds or an explicitly supplied fallback duration.
         cfg["sleep_logic"]["fallback_confirm_seconds"] = _float(
             "GUARD_SLEEP_FALLBACK_SECONDS", _float("GUARD_TEST_SLEEP_FALLBACK_SECONDS", 4.0))
-        cfg["rules"].update(
-            sleep_seconds=_float("GUARD_TEST_SLEEP_SECONDS", 5.0),
-            phone_seconds=_float("GUARD_TEST_PHONE_SECONDS", 5.0),
-            stationary_seconds=_float("GUARD_TEST_STATIONARY_SECONDS", 8.0),
-            absence_seconds=_float("GUARD_TEST_ABSENCE_SECONDS", 5.0),
-            warmup_seconds=0.0,
-        )
+
+        # Test mode only supplies SHORTER DEFAULTS; it must never override a
+        # threshold the operator set explicitly, or GUARD_SLEEP_SECONDS and
+        # friends would silently do nothing whenever test mode is on. This is
+        # the same "explicit value wins, else test value, else fallback"
+        # precedence fallback_confirm_seconds above already uses.
+        test_defaults = {
+            "sleep_seconds": ("GUARD_SLEEP_SECONDS", "GUARD_TEST_SLEEP_SECONDS", 5.0),
+            "phone_seconds": ("GUARD_PHONE_SECONDS", "GUARD_TEST_PHONE_SECONDS", 5.0),
+            "stationary_seconds": (
+                "GUARD_STATIONARY_SECONDS", "GUARD_TEST_STATIONARY_SECONDS", 8.0),
+            "absence_seconds": ("GUARD_ABSENCE_SECONDS", "GUARD_TEST_ABSENCE_SECONDS", 5.0),
+        }
+        for key, (explicit_var, test_var, fallback) in test_defaults.items():
+            if not _is_set(explicit_var):
+                cfg["rules"][key] = _float(test_var, fallback)
+        if not _is_set("GUARD_RULE_WARMUP_SECONDS"):
+            cfg["rules"]["warmup_seconds"] = 0.0
 
     validate_config(cfg)
     return cfg
