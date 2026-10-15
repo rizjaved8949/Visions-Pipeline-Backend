@@ -316,8 +316,21 @@ class KitchenPipeline:
         self.show_labels = bool(display_prefs.get("show_labels", True))
         self.show_confidence = bool(display_prefs.get("show_confidence", True))
 
+        # The per-staff status panel burned into the right of the frame. Off by
+        # default: the host UI shows the same PPE status live in its own KPIs,
+        # chart and violation feed, where it is readable and filterable rather
+        # than baked into the video. Set KITCHEN_SHOW_SIDE_PANEL=true to get the
+        # old in-frame panel back.
+        self.show_side_panel = os.getenv(
+            "KITCHEN_SHOW_SIDE_PANEL", ""
+        ).strip().lower() in {"1", "true", "yes", "on"}
+
 
         self.display_ids = {}
+
+        # track_id -> that person's most recent compliance card, kept for the
+        # whole session so the final summary can describe everyone who appeared.
+        self.person_cards_seen = {}
 
         self.next_display_id = 1
         self.track_id_offset = 0
@@ -1162,6 +1175,7 @@ class KitchenPipeline:
             show_boxes=self.show_detection_boxes,
             show_labels=self.show_labels,
             show_confidence=self.show_confidence,
+            show_panel=self.show_side_panel,
             thumbnails=getattr(getattr(self, "presence", None), "thumbnails", None),
             show_raw_ppe=os.getenv("KITCHEN_SHOW_RAW_PPE_BOXES", "").lower()
             in {"1", "true", "yes", "on"},
@@ -1272,6 +1286,18 @@ class KitchenPipeline:
         )
 
 
+        # Keep each person's most recent card. _summary() is per-frame, so the
+        # roster it produces is "who is on screen right now" - correct for the
+        # live read, but it means the summary stored when the run ends describes
+        # only the final frame, which is usually empty. The run-end summary is
+        # rebuilt from this instead, so a finished video reports everyone who
+        # appeared in it rather than "no staff detected".
+        seen = getattr(self, "person_cards_seen", None)
+        if seen is None:
+            seen = self.person_cards_seen = {}
+        for person in processed_people:
+            seen[person["track_id"]] = person
+
         summary = self._summary(
             processed_people
         )
@@ -1372,7 +1398,7 @@ class KitchenPipeline:
 
 
         output_width, output_height = annotation_size(
-            width, height, self.show_labels
+            width, height, self.show_labels, self.show_side_panel
         )
         writer = make_writer(
             self.output_video,
@@ -1553,6 +1579,16 @@ class KitchenPipeline:
         )
 
 
+        # Describe the whole session, not just the last frame - by the time a
+        # clip ends the final frame is usually empty, which previously stored a
+        # summary saying no staff were detected at all.
+        seen_cards = getattr(self, "person_cards_seen", None) or {}
+        final_summary = (
+            self._summary(list(seen_cards.values()))
+            if seen_cards
+            else last_summary
+        )
+
         STORE.update_session(
             self.session_id,
             status=final_status,
@@ -1560,8 +1596,8 @@ class KitchenPipeline:
             processed_frames=
                 frame_number,
             summary_json=
-                last_summary,
+                final_summary,
         )
 
 
-        return last_summary
+        return final_summary

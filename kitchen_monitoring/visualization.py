@@ -55,12 +55,13 @@ def status_rows(person):
     return rows
 
 
-def annotation_size(width, height, show_labels=True):
+def annotation_size(width, height, show_labels=True, show_panel=True):
     # Enlarge the presentation, not the inference image. Even sizes suit H.264.
     out_height = max(720, min(1080, int(height)))
     out_height += out_height % 2
     out_width = max(2, round(width * out_height / height / 2) * 2)
-    return out_width + (PANEL_WIDTH if show_labels else 0), out_height
+    panel = PANEL_WIDTH if (show_labels and show_panel) else 0
+    return out_width + panel, out_height
 
 
 def person_color(track_id):
@@ -75,10 +76,14 @@ def _text(image, text, xy, color=(235, 238, 242), scale=0.48, thickness=1):
 
 def annotate_people(frame, persons, detections, *, show_boxes=True,
                     show_labels=True, show_confidence=True, show_raw_ppe=False,
-                    thumbnails=None):
+                    thumbnails=None, show_panel=True):
+    """`show_panel` controls only the per-staff status panel appended to the
+    right of the frame. It is separate from `show_labels` so the panel can be
+    dropped - letting the host surface the same PPE status in its own live UI -
+    while the in-frame STAFF-xx badges on each person are kept."""
     height, width = frame.shape[:2]
-    out_width, out_height = annotation_size(width, height, show_labels)
-    scene_width = out_width - (PANEL_WIDTH if show_labels else 0)
+    out_width, out_height = annotation_size(width, height, show_labels, show_panel)
+    scene_width = out_width - (PANEL_WIDTH if (show_labels and show_panel) else 0)
     scene = cv2.resize(frame, (scene_width, out_height), interpolation=cv2.INTER_LINEAR)
     sx, sy = scene_width / width, out_height / height
     def display_order(person):
@@ -136,7 +141,7 @@ def annotate_people(frame, persons, detections, *, show_boxes=True,
         cv2.rectangle(scene, (left, top), (right, bottom), color, -1)
         _text(scene, label, (left + 7, top + 18), (18, 22, 29), 0.5)
 
-    if not show_labels:
+    if not show_labels or not show_panel:
         return scene
 
     # Minimal presentation: photo, staff ID and four status rows only.
